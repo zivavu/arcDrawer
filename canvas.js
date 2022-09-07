@@ -5,7 +5,6 @@ canvas.height = window.innerHeight;
 window.addEventListener('resize', () => {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
-	draw();
 });
 
 let mouseHolding = false;
@@ -14,9 +13,19 @@ let mouse = {
 	y: 0,
 };
 
-function draw(e) {
+function draw() {
+	let x = mouse.x,
+		y = mouse.y,
+		width = Math.random() * 2,
+		height = Math.random() * 100;
+
+	ctx.save();
+	ctx.translate(x, y);
+	ctx.rotate(((Math.PI * 180) / Math.random()) * 25);
+	ctx.translate(-x, -y);
 	ctx.fillStyle = 'white';
-	ctx.fillRect(mouse.x - 25, mouse.y - 25, 50, 50);
+	ctx.fillRect(x, y, width, height);
+	ctx.restore();
 }
 
 canvas.addEventListener('click', draw);
