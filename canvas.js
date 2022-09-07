@@ -1,3 +1,5 @@
+import { blur, lineWidth, previousOffsetMultiplier } from './settings.js';
+
 const container = document.getElementById('canvas-container');
 let canvas = document.querySelector('.canvas');
 let ctx = canvas.getContext('2d');
@@ -9,57 +11,57 @@ canvas.height = window.innerHeight;
 window.addEventListener('resize', setDimentions);
 
 function setDimentions() {
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 }
 let mouseHolding = false;
 let mouse = {
-	x: 0,
-	y: 0,
+    x: 0,
+    y: 0,
 };
 
 function draw() {
-	let offsetWeight = 30;
-	let previousOffsetMultiplier = 1.3;
-	let strokesNumber = Math.ceil(Math.random() * 10);
+    console.log('drawing');
+    let offsetWeight = 30;
+    let strokesNumber = Math.ceil(Math.random() * 10);
 
-	let currentPos = {
-		x: mouse.x,
-		y: mouse.y,
-	};
-	let previousPos = {
-		x: mouse.x,
-		y: mouse.y,
-	};
-	let previousOffset = { x: 0, y: 0 };
+    let currentPos = {
+        x: mouse.x,
+        y: mouse.y,
+    };
+    let previousPos = {
+        x: mouse.x,
+        y: mouse.y,
+    };
+    let previousOffset = { x: 0, y: 0 };
 
-	ctx.strokeStyle = 'white';
-	ctx.beginPath();
-	ctx.filter = 'blur(10px)';
-	for (let i = 0; i < strokesNumber; i++) {
-		ctx.lineWidth = Math.random() * 1.3;
-		ctx.moveTo(previousPos.x, previousPos.y);
-		let offset = {
-			x: Math.random() * offsetWeight - offsetWeight / 2,
-			y: Math.random() * offsetWeight - offsetWeight / 2,
-		};
-		ctx.lineTo(
-			currentPos.x + offset.x + previousOffset.x * previousOffsetMultiplier,
-			currentPos.y + offset.y + previousOffset.y * previousOffsetMultiplier
-		);
-		ctx.stroke();
-		previousPos = {
-			x: currentPos.x + offset.x + previousOffset.x * previousOffsetMultiplier,
-			y: currentPos.y + offset.y + previousOffset.y * previousOffsetMultiplier,
-		};
-		previousOffset = {
-			x: offset.x + previousOffset.x * previousOffsetMultiplier,
-			y: offset.y + previousOffset.y * previousOffsetMultiplier,
-		};
-	}
-	ctx.closePath();
-	ctx.fillStyle = 'rgba(0, 0, 0, 0.001)';
-	ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    ctx.strokeStyle = 'white';
+    ctx.beginPath();
+    ctx.filter = `blur(${blur}px)`;
+    for (let i = 0; i < strokesNumber; i++) {
+        ctx.lineWidth = Math.random() * lineWidth;
+        ctx.moveTo(previousPos.x, previousPos.y);
+        let offset = {
+            x: Math.random() * offsetWeight - offsetWeight / 2,
+            y: Math.random() * offsetWeight - offsetWeight / 2,
+        };
+        ctx.lineTo(
+            currentPos.x + offset.x + previousOffset.x * previousOffsetMultiplier,
+            currentPos.y + offset.y + previousOffset.y * previousOffsetMultiplier
+        );
+        ctx.stroke();
+        previousPos = {
+            x: currentPos.x + offset.x + previousOffset.x * previousOffsetMultiplier,
+            y: currentPos.y + offset.y + previousOffset.y * previousOffsetMultiplier,
+        };
+        previousOffset = {
+            x: offset.x + previousOffset.x * previousOffsetMultiplier,
+            y: offset.y + previousOffset.y * previousOffsetMultiplier,
+        };
+    }
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.001)';
+    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 }
 /////////////////// FIRST VERSION //////////////////////
 // let x = mouse.x,
@@ -79,55 +81,50 @@ canvas.addEventListener('mousemove', updateMousePosition);
 canvas.addEventListener('mousedown', mouseHoldingOn);
 canvas.addEventListener('mouseup', newLayer);
 window.onkeydown = (e) => {
-	if (e.key === 'z' && e.ctrlKey) {
-		e.preventDefault();
-		undo();
-	}
+    if (e.key === 'z' && e.ctrlKey) {
+        e.preventDefault();
+        undo();
+    }
 };
 
 container.addEventListener('mouseleave', (e) => {
-	if (
-		e.clientY <= 0 ||
-		e.clientX <= 0 ||
-		e.clientX >= window.innerWidth ||
-		e.clientY >= window.innerHeight
-	) {
-		mouseHolding = false;
-	}
+    if (e.clientY <= 0 || e.clientX <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
+        mouseHolding = false;
+    }
 });
 
 function mouseHoldingOn() {
-	mouseHolding = true;
+    mouseHolding = true;
 }
 function updateMousePosition(e) {
-	mouse.x = e.clientX;
-	mouse.y = e.clientY;
-	if (mouseHolding) draw();
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+    if (mouseHolding) draw();
 }
 function newLayer() {
-	canvas.removeEventListener('mousemove', updateMousePosition);
-	canvas.removeEventListener('mousedown', mouseHoldingOn);
-	canvas.removeEventListener('mouseup', newLayer);
-
-	mouseHolding = false;
-	canvas = document.createElement('canvas');
-	ctx = canvas.getContext('2d');
-	setDimentions();
-	canvas.classList.add('canvas');
-	container.appendChild(canvas);
-	canvasArr.push(canvas);
-
-	canvas.addEventListener('mousemove', updateMousePosition);
-	canvas.addEventListener('mousedown', mouseHoldingOn);
-	canvas.addEventListener('mouseup', newLayer);
+    mouseHolding = false;
+    canvas = document.createElement('canvas');
+    ctx = canvas.getContext('2d');
+    setDimentions();
+    canvas.classList.add('canvas');
+    container.appendChild(canvas);
+    canvasArr.push(canvas);
+    addCanvasListeners(canvas);
 }
 function undo() {
-	if (canvasArr[canvasArr.length - 2]) {
-		canvasArr[canvasArr.length - 1].remove();
-		canvasArr.pop();
-	} else {
-		canvasArr[0].remove();
-		canvasArr.pop();
-		newLayer();
-	}
+    if (canvasArr[canvasArr.length - 2]) {
+        canvasArr[canvasArr.length - 1].remove();
+        canvasArr.pop();
+        if (canvasArr[canvasArr.length - 1]) ctx = canvasArr[canvasArr.length - 1].getContext('2d');
+    } else {
+        canvasArr[0].remove();
+        canvasArr.pop();
+        newLayer();
+    }
+}
+
+function addCanvasListeners(canvas) {
+    canvas.addEventListener('mousemove', updateMousePosition);
+    canvas.addEventListener('mousedown', mouseHoldingOn);
+    canvas.addEventListener('mouseup', newLayer);
 }

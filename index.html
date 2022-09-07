@@ -1,16 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" href="style.css" />
-		<title>ProbabilityDrawer</title>
-		<script defer src="canvas.js" type="text/javascript"></script>
-	</head>
-	<body>
-		<div id="canvas-container">
-			<canvas class="canvas"></canvas>
-		</div>
-	</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="style.css" />
+        <title>ProbabilityDrawer</title>
+        <script defer src="canvas.js" type="module"></script>
+        <script defer src="settings.js" type="module"></script>
+    </head>
+    <body>
+        <div id="canvas-container">
+            <canvas class="canvas"></canvas>
+        </div>
+        <div id="settings-menu">
+            <label for="blur-range">Blur</label>
+            <input type="range" id="blur-range" min="0" max="10" step="0.5" value="0" />
+
+            <label for="previous-offset-multiplier">Arc Stability</label>
+            <input type="range" id="prev-offset-multiplier-range" min="0.6" max="2" step="0.05" value="0" />
+
+            <label for="line-width">Line Width</label>
+            <input type="range" id="line-width" min="0.05" max="10" step="0.2" value="3" />
+
+            <div id="settings-hide-button">></div>
+        </div>
+        <div id="settings-show-button"></div>
+    </body>
 </html>
