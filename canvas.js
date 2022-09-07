@@ -1,12 +1,17 @@
-const canvas = document.getElementById('canvas1');
-const ctx = canvas.getContext('2d');
+const container = document.getElementById('canvas-container');
+let canvas = document.querySelector('.canvas');
+let ctx = canvas.getContext('2d');
+let canvasArr = [canvas];
+
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-window.addEventListener('resize', () => {
+
+window.addEventListener('resize', setDimentions);
+
+function setDimentions() {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
-});
-
+}
 let mouseHolding = false;
 let mouse = {
 	x: 0,
@@ -15,7 +20,7 @@ let mouse = {
 
 function draw() {
 	let offsetWeight = 30;
-	let previousOffsetMultiplier = 1.4;
+	let previousOffsetMultiplier = 1.3;
 	let strokesNumber = Math.ceil(Math.random() * 10);
 
 	let currentPos = {
@@ -30,6 +35,7 @@ function draw() {
 
 	ctx.strokeStyle = 'white';
 	ctx.beginPath();
+	ctx.filter = 'blur(10px)';
 	for (let i = 0; i < strokesNumber; i++) {
 		ctx.lineWidth = Math.random() * 1.3;
 		ctx.moveTo(previousPos.x, previousPos.y);
@@ -52,7 +58,6 @@ function draw() {
 		};
 	}
 	ctx.closePath();
-	ctx.filter = 'blur(0.7px)';
 	ctx.fillStyle = 'rgba(0, 0, 0, 0.001)';
 	ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 }
@@ -70,11 +75,17 @@ function draw() {
 // ctx.fillRect(x, y, width, height);
 // ctx.restore();
 
-canvas.addEventListener('click', draw);
 canvas.addEventListener('mousemove', updateMousePosition);
-canvas.addEventListener('mousedown', () => (mouseHolding = true));
-canvas.addEventListener('mouseup', () => (mouseHolding = false));
-canvas.addEventListener('mouseleave', (e) => {
+canvas.addEventListener('mousedown', mouseHoldingOn);
+canvas.addEventListener('mouseup', newLayer);
+window.onkeydown = (e) => {
+	if (e.key === 'z' && e.ctrlKey) {
+		e.preventDefault();
+		undo();
+	}
+};
+
+container.addEventListener('mouseleave', (e) => {
 	if (
 		e.clientY <= 0 ||
 		e.clientX <= 0 ||
@@ -85,8 +96,38 @@ canvas.addEventListener('mouseleave', (e) => {
 	}
 });
 
+function mouseHoldingOn() {
+	mouseHolding = true;
+}
 function updateMousePosition(e) {
 	mouse.x = e.clientX;
 	mouse.y = e.clientY;
 	if (mouseHolding) draw();
+}
+function newLayer() {
+	canvas.removeEventListener('mousemove', updateMousePosition);
+	canvas.removeEventListener('mousedown', mouseHoldingOn);
+	canvas.removeEventListener('mouseup', newLayer);
+
+	mouseHolding = false;
+	canvas = document.createElement('canvas');
+	ctx = canvas.getContext('2d');
+	setDimentions();
+	canvas.classList.add('canvas');
+	container.appendChild(canvas);
+	canvasArr.push(canvas);
+
+	canvas.addEventListener('mousemove', updateMousePosition);
+	canvas.addEventListener('mousedown', mouseHoldingOn);
+	canvas.addEventListener('mouseup', newLayer);
+}
+function undo() {
+	if (canvasArr[canvasArr.length - 2]) {
+		canvasArr[canvasArr.length - 1].remove();
+		canvasArr.pop();
+	} else {
+		canvasArr[0].remove();
+		canvasArr.pop();
+		newLayer();
+	}
 }
