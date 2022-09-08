@@ -2,9 +2,11 @@ const setingsOpenButton = document.getElementById('settings-show-button');
 const settingsCloseButton = document.getElementById('settings-hide-button');
 const settingsMenuElement = document.getElementById('settings-menu');
 
-const lineWidthRange = document.getElementById('line-width');
+const lineWidthRange = document.getElementById('line-width-range');
 const blurRange = document.getElementById('blur-range');
 const prevOffsetMultiplierRange = document.getElementById('prev-offset-multiplier-range');
+const strokesNumberRange = document.getElementById('strokes-number-range');
+const offsetWeightRange = document.getElementById('offset-weight-range');
 
 setingsOpenButton.addEventListener('click', showSettingsMenu);
 function showSettingsMenu() {
@@ -34,6 +36,19 @@ export let lineWidth = 2;
 lineWidthRange.value = lineWidth;
 lineWidthRange.addEventListener('change', updateLineWidth);
 function updateLineWidth(e) {
-    console.log(e.target.value);
     lineWidth = e.target.value;
+}
+
+export let strokesNumber = 7;
+strokesNumberRange.value = strokesNumber;
+strokesNumberRange.addEventListener('change', updateStrokesNumber);
+function updateStrokesNumber(e) {
+    strokesNumber = e.target.value;
+}
+
+export let offsetWeight = 40;
+offsetWeightRange.value = offsetWeight;
+offsetWeightRange.addEventListener('change', updateOffsetWeight);
+function updateOffsetWeight(e) {
+    offsetWeight = e.target.value;
 }

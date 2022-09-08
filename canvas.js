@@ -1,4 +1,4 @@
-import { blur, lineWidth, previousOffsetMultiplier } from './settings.js';
+import { blur, lineWidth, previousOffsetMultiplier, strokesNumber, offsetWeight } from './settings.js';
 
 const container = document.getElementById('canvas-container');
 let canvas = document.querySelector('.canvas');
@@ -21,9 +21,6 @@ let mouse = {
 };
 
 function draw() {
-    let offsetWeight = 30;
-    let strokesNumber = Math.ceil(Math.random() * 10);
-
     let currentPos = {
         x: mouse.x,
         y: mouse.y,
