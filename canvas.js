@@ -1,4 +1,4 @@
-import { blur, lineWidth, previousOffsetMultiplier, strokesNumber, offsetWeight } from './settings.js';
+import { blur, lineWidth, offsetWeight, previousOffsetMultiplier, strokesNumber } from './settings.js';
 
 const container = document.getElementById('canvas-container');
 let canvas = document.querySelector('.canvas');
