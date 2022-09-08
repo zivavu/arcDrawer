@@ -21,7 +21,6 @@ let mouse = {
 };
 
 function draw() {
-    console.log('drawing');
     let offsetWeight = 30;
     let strokesNumber = Math.ceil(Math.random() * 10);
 
@@ -113,14 +112,12 @@ function newLayer() {
 }
 function undo() {
     if (canvasArr[canvasArr.length - 2]) {
-        canvasArr[canvasArr.length - 1].remove();
+        canvasArr[canvasArr.length - 2].remove();
         canvasArr.pop();
-        if (canvasArr[canvasArr.length - 1]) ctx = canvasArr[canvasArr.length - 1].getContext('2d');
-    } else {
-        canvasArr[0].remove();
-        canvasArr.pop();
-        newLayer();
     }
+    canvasArr[canvasArr.length - 1].remove();
+    canvasArr.pop();
+    newLayer();
 }
 
 function addCanvasListeners(canvas) {
