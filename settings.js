@@ -1,3 +1,4 @@
+import { undo } from './canvas.js';
 const setingsOpenButton = document.getElementById('settings-show-button');
 const settingsCloseButton = document.getElementById('settings-hide-button');
 const settingsMenuElement = document.getElementById('settings-menu');
@@ -40,8 +41,12 @@ function updatePrevOffsetMultiplier(e) {
 export let lineWidth = 1;
 lineWidthRange.value = lineWidth;
 lineWidthRange.addEventListener('change', updateLineWidth);
+
 function updateLineWidth(e) {
-    lineWidth = e.target.value;
+    let withInput = e.target.value;
+    if (withInput > 1) withInput = Math.pow(withInput, 4);
+    console.log(withInput);
+    lineWidth = withInput;
 }
 
 export let strokesNumber = 7;
@@ -117,3 +122,16 @@ function selectBrush(e) {
     strokesNumberRange.value = selectedBrush.strokesNumber;
     colorInput.value = selectedBrush.arcColor;
 }
+
+//// Shortcuts/////
+
+window.onkeydown = (e) => {
+    if (e.key === 'z' && e.ctrlKey) {
+        e.preventDefault();
+        undo();
+    }
+    if (e.key === 'c') {
+        e.preventDefault();
+        colorInput.showPicker();
+    }
+};

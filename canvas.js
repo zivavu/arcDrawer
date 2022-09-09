@@ -80,20 +80,12 @@ function draw() {
 canvas.addEventListener('mousemove', updateMousePosition);
 canvas.addEventListener('mousedown', mouseHoldingOn);
 canvas.addEventListener('mouseup', newRestorePoint);
-window.onkeydown = (e) => {
-    if (e.key === 'z' && e.ctrlKey) {
-        e.preventDefault();
-        undo();
-    }
-};
 
 container.addEventListener('mouseleave', (e) => {
-    if (e.clientY <= 0 || e.clientX <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
+    if (mouseHolding == true) {
+        newRestorePoint();
         mouseHolding = false;
     }
-});
-settingsMenuElement.addEventListener('mouseover', (e) => {
-    mouseHolding = false;
 });
 
 function mouseHoldingOn() {
@@ -103,6 +95,7 @@ function updateMousePosition(e) {
     mouse.x = e.clientX;
     mouse.y = e.clientY;
     if (mouseHolding) draw();
+    console.log(mouse.x, mouse.y);
 }
 function newRestorePoint() {
     mouseHolding = false;
@@ -114,7 +107,7 @@ function newRestorePoint() {
     canvasArr.push(canvas);
     addCanvasListeners(canvas);
 }
-function undo() {
+export function undo() {
     if (canvasArr[canvasArr.length - 2]) {
         canvasArr[canvasArr.length - 1].remove();
         canvasArr.pop();
