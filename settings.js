@@ -1,7 +1,9 @@
-import { undo } from './canvas.js';
+import { clearAllCanvas, undo } from './canvas.js';
 const setingsOpenButton = document.getElementById('settings-show-button');
 const settingsCloseButton = document.getElementById('settings-hide-button');
 const settingsMenuElement = document.getElementById('settings-menu');
+const settingsArcButton = document.getElementById('arc-settings-button');
+const settingsShadowButton = document.getElementById('shadow-settings-button');
 
 const lineWidthRange = document.getElementById('line-width-range');
 const blurRange = document.getElementById('blur-range');
@@ -26,6 +28,9 @@ function hideSettingsMenu() {
     settingsMenuElement.style.animationFillMode = 'forwards';
 }
 
+settingsShadowButton.addEventListener('click', showShadowSettings());
+function showShadowSettings() {}
+
 export let blur = 3;
 blurRange.value = blur;
 blurRange.addEventListener('change', updateBlur);
@@ -44,8 +49,7 @@ lineWidthRange.addEventListener('change', updateLineWidth);
 
 function updateLineWidth(e) {
     let withInput = e.target.value;
-    if (withInput > 1) withInput = Math.pow(withInput, 4);
-    console.log(withInput);
+    if (withInput > 1) withInput = Math.pow(withInput, 5);
     lineWidth = withInput;
 }
 
@@ -129,6 +133,10 @@ window.onkeydown = (e) => {
     if (e.key === 'z' && e.ctrlKey) {
         e.preventDefault();
         undo();
+    }
+    if (e.key === 'r' && e.ctrlKey) {
+        e.preventDefault();
+        clearAllCanvas();
     }
     if (e.key === 'c') {
         e.preventDefault();

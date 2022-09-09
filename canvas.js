@@ -95,7 +95,6 @@ function updateMousePosition(e) {
     mouse.x = e.clientX;
     mouse.y = e.clientY;
     if (mouseHolding) draw();
-    console.log(mouse.x, mouse.y);
 }
 function newRestorePoint() {
     mouseHolding = false;
@@ -121,4 +120,10 @@ function addCanvasListeners(canvas) {
     canvas.addEventListener('mousemove', updateMousePosition);
     canvas.addEventListener('mousedown', mouseHoldingOn);
     canvas.addEventListener('mouseup', newRestorePoint);
+}
+
+export function clearAllCanvas() {
+    container.innerHTML = '';
+    canvasArr = [];
+    newRestorePoint();
 }
