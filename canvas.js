@@ -34,6 +34,8 @@ function draw() {
     ctx.strokeStyle = 'white';
     ctx.beginPath();
     ctx.filter = `blur(${blur}px)`;
+    ctx.shadowColor = 'black';
+    ctx.shadowBlur = 4;
     for (let i = 0; i < strokesNumber; i++) {
         ctx.lineWidth = Math.random() * lineWidth;
         ctx.moveTo(previousPos.x, previousPos.y);
@@ -75,7 +77,7 @@ function draw() {
 
 canvas.addEventListener('mousemove', updateMousePosition);
 canvas.addEventListener('mousedown', mouseHoldingOn);
-canvas.addEventListener('mouseup', newLayer);
+canvas.addEventListener('mouseup', newRestorePoint);
 window.onkeydown = (e) => {
     if (e.key === 'z' && e.ctrlKey) {
         e.preventDefault();
@@ -97,7 +99,7 @@ function updateMousePosition(e) {
     mouse.y = e.clientY;
     if (mouseHolding) draw();
 }
-function newLayer() {
+function newRestorePoint() {
     mouseHolding = false;
     canvas = document.createElement('canvas');
     ctx = canvas.getContext('2d');
@@ -109,16 +111,16 @@ function newLayer() {
 }
 function undo() {
     if (canvasArr[canvasArr.length - 2]) {
-        canvasArr[canvasArr.length - 2].remove();
+        canvasArr[canvasArr.length - 1].remove();
         canvasArr.pop();
     }
     canvasArr[canvasArr.length - 1].remove();
     canvasArr.pop();
-    newLayer();
+    newRestorePoint();
 }
 
 function addCanvasListeners(canvas) {
     canvas.addEventListener('mousemove', updateMousePosition);
     canvas.addEventListener('mousedown', mouseHoldingOn);
-    canvas.addEventListener('mouseup', newLayer);
+    canvas.addEventListener('mouseup', newRestorePoint);
 }
