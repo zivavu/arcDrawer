@@ -1,14 +1,14 @@
-import { blur, lineWidth, offsetWeight, previousOffsetMultiplier, strokesNumber } from './settings.js';
+import { arcColor, blur, lineWidth, offsetWeight, previousOffsetMultiplier, strokesNumber } from './settings.js';
 
 const container = document.getElementById('canvas-container');
+const settingsMenuElement = document.getElementById('settings-menu');
+
 let canvas = document.querySelector('.canvas');
 let ctx = canvas.getContext('2d');
 let canvasArr = [canvas];
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-
-window.addEventListener('resize', setDimentions);
 
 function setDimentions() {
     canvas.width = window.innerWidth;
@@ -31,11 +31,13 @@ function draw() {
     };
     let previousOffset = { x: 0, y: 0 };
 
-    ctx.strokeStyle = 'white';
+    ctx.strokeStyle = arcColor;
     ctx.beginPath();
     ctx.filter = `blur(${blur}px)`;
     ctx.shadowColor = 'black';
-    ctx.shadowBlur = 4;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.shadowBlur = 0;
     for (let i = 0; i < strokesNumber; i++) {
         ctx.lineWidth = Math.random() * lineWidth;
         ctx.moveTo(previousPos.x, previousPos.y);
@@ -89,6 +91,9 @@ container.addEventListener('mouseleave', (e) => {
     if (e.clientY <= 0 || e.clientX <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
         mouseHolding = false;
     }
+});
+settingsMenuElement.addEventListener('mouseover', (e) => {
+    mouseHolding = false;
 });
 
 function mouseHoldingOn() {

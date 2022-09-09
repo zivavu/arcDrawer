@@ -8,6 +8,8 @@ const prevOffsetMultiplierRange = document.getElementById('prev-offset-multiplie
 const strokesNumberRange = document.getElementById('strokes-number-range');
 const offsetWeightRange = document.getElementById('offset-weight-range');
 
+const colorInput = document.getElementById('color-picker');
+
 const savedArcsContainer = document.getElementById('saved-arcs');
 const saveArcButton = document.getElementById('save-arc-button');
 
@@ -23,7 +25,7 @@ function hideSettingsMenu() {
     settingsMenuElement.style.animationFillMode = 'forwards';
 }
 
-export let blur = 0;
+export let blur = 3;
 blurRange.value = blur;
 blurRange.addEventListener('change', updateBlur);
 function updateBlur(e) {
@@ -35,7 +37,7 @@ prevOffsetMultiplierRange.addEventListener('change', updatePrevOffsetMultiplier)
 function updatePrevOffsetMultiplier(e) {
     previousOffsetMultiplier = e.target.value;
 }
-export let lineWidth = 2;
+export let lineWidth = 1;
 lineWidthRange.value = lineWidth;
 lineWidthRange.addEventListener('change', updateLineWidth);
 function updateLineWidth(e) {
@@ -56,6 +58,13 @@ function updateOffsetWeight(e) {
     offsetWeight = e.target.value;
 }
 
+export let arcColor = 'white';
+colorInput.value = '#FFFFFF';
+colorInput.addEventListener('change', updateArcColor);
+function updateArcColor(e) {
+    arcColor = e.target.value;
+}
+
 let arcArr = [];
 saveArcButton.addEventListener('click', saveArc);
 function saveArc() {
@@ -66,6 +75,7 @@ function saveArc() {
         offsetWeight: offsetWeight,
         previousOffsetMultiplier: previousOffsetMultiplier,
         blur: blur,
+        arcColor: arcColor,
         node: document.createElement('div'),
     };
     arcArr.push(arc);
@@ -76,6 +86,7 @@ function saveArc() {
 }
 function showSavedArcs() {
     arcArr.forEach((arc) => {
+        arc.node.style.backgroundColor = arc.arcColor;
         savedArcsContainer.appendChild(arc.node);
         arc.node.addEventListener('click', selectBrush);
     });
@@ -97,10 +108,12 @@ function selectBrush(e) {
     offsetWeight = selectedBrush.offsetWeight;
     lineWidth = selectedBrush.lineWidth;
     strokesNumber = selectedBrush.strokesNumber;
+    arcColor = selectedBrush.arcColor;
 
     blurRange.value = selectedBrush.blur;
     prevOffsetMultiplierRange.value = selectedBrush.previousOffsetMultiplier;
     offsetWeightRange.value = selectedBrush.offsetWeight;
     lineWidthRange.value = selectedBrush.lineWidth;
     strokesNumberRange.value = selectedBrush.strokesNumber;
+    colorInput.value = selectedBrush.arcColor;
 }

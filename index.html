@@ -18,25 +18,33 @@
             <canvas class="canvas"></canvas>
         </div>
         <div id="settings-menu">
-            <label for="line-width-range">Line Width</label>
-            <input type="range" id="line-width-range" min="0.05" max="10" step="0.05" value="3" />
+            <div id="aspects">
+                <button id="arc-options-button">ARC</button>
+                <button id="shadow-options-button">SHADOW</button>
+            </div>
+            <div id="arc-settings">
+                <label for="line-width-range">Line Width</label>
+                <input type="range" id="line-width-range" min="0.05" max="10" step="0.05" value="3" />
 
-            <label for="strokes-number-range">Strokes Number</label>
-            <input type="range" id="strokes-number-range" min="1" max="30" step="1" value="7" />
+                <label for="strokes-number-range">Strokes Number</label>
+                <input type="range" id="strokes-number-range" min="1" max="30" step="1" value="7" />
 
-            <label for="previous-offset-multiplier">Arc Stability</label>
-            <input type="range" id="prev-offset-multiplier-range" min="0.6" max="2" step="0.05" value="0" />
+                <label for="previous-offset-multiplier">Arc Stability</label>
+                <input type="range" id="prev-offset-multiplier-range" min="0.6" max="2" step="0.05" value="0" />
 
-            <label for="offset-weight-range">Arc Unstability</label>
-            <input type="range" id="offset-weight-range" min="1" max="90" step="1" value="3" />
+                <label for="offset-weight-range">Arc Unstability</label>
+                <input type="range" id="offset-weight-range" min="1" max="90" step="1" value="3" />
 
-            <label for="blur-range">Blur</label>
-            <input type="range" id="blur-range" min="0" max="10" step="0.1" value="0" />
+                <label for="blur-range">Blur</label>
+                <input type="range" id="blur-range" min="0" max="10" step="0.1" value="0" />
 
-            <input type="button" id="save-arc-button" value="Save Arc" />
-            <div id="saved-arcs"></div>
+                <input id="color-picker" type="color" />
 
-            <div id="settings-hide-button">></div>
+                <input type="button" id="save-arc-button" value="Save Arc" />
+                <div id="saved-arcs"></div>
+
+                <div id="settings-hide-button">></div>
+            </div>
         </div>
         <div id="settings-show-button"></div>
     </body>

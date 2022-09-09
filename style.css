@@ -58,9 +58,18 @@ body {
     flex-direction: column;
     position: absolute;
     top: 0;
-    right: -25vmin;
+    right: 0vmin;
     width: 25vmin;
     height: 100vh;
+    background-color: rgb(15, 15, 15);
+    z-index: 1;
+}
+#arc-settings {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
     background-color: rgb(15, 15, 15);
     z-index: 1;
 }
@@ -130,6 +139,30 @@ label {
     font-size: 2.5vmin;
     color: white;
     padding-top: 2.5vmin;
+}
+#color-picker {
+    margin-top: 2vh;
+    width: 80%;
+}
+#aspects {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-content: space-between;
+}
+#aspects button {
+    height: 4vh;
+    width: 50%;
+    font-size: 2.5vmin;
+    background-color: rgb(98, 98, 255);
+    box-sizing: border-box;
+    border: none;
+    border-left: 0.3vh solid rgb(15, 15, 15);
+    color: white;
+    line-height: 4vmin;
+    font-size: 2vmin;
+    font-weight: 500;
+    text-shadow: 0 0 0.1vmin white;
 }
 #saved-arcs {
     box-sizing: border-box;
