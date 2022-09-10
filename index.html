@@ -48,9 +48,25 @@
 
                     <label for="color-picker">Arc Color</label>
                     <input id="color-picker" type="color" />
+                    <hr />
                 </div>
 
-                <div id="shadow-settings" class="sub-settings"></div>
+                <div id="shadow-settings" class="sub-settings">
+                    <hr />
+                    <label for="shadow-offset-range">Shadow Offset</label>
+                    <input type="range" id="shadow-offset-range" min="0" max="50" step="0.5" />
+
+                    <label for="shadow-blur-range">Shadow blur</label>
+                    <input type="range" id="shadow-blur-range" min="0" max="20" step="0.2" />
+
+                    <label for="shadow-color-picker">Shadow Color</label>
+                    <input type="color" id="shadow-color-picker" />
+
+                    <hr />
+                    <label for="shadow-color-randomize-checkbox">Randomize Color</label>
+                    <input type="checkbox" id="shadow-color-randomize-checkbox" />
+                    <hr />
+                </div>
             </div>
 
             <input type="button" id="save-brush-button" value="Save Brush" />

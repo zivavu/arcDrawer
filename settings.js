@@ -5,8 +5,14 @@ const settingsMenuElement = document.getElementById('settings-menu');
 const settingsArcButton = document.getElementById('arc-settings-button');
 const settingsShadowButton = document.getElementById('shadow-settings-button');
 const arcSettingsContainer = document.getElementById('arc-settings');
-const shadowSettingsContainer = document.getElementById('shadow-settings');
 
+const shadowSettingsContainer = document.getElementById('shadow-settings');
+const shadowOffsetRange = document.getElementById('shadow-offset-range');
+const shadowBlurRange = document.getElementById('shadow-blur-range');
+const shadowColorPicker = document.getElementById('shadow-color-picker');
+const ShadowColorRandomizeCheckbox = document.getElementById('shadow-color-randomize-checkbox');
+
+console.log(shadowOffsetRange, shadowBlurRange, shadowColorPicker, ShadowColorRandomizeCheckbox);
 const lineWidthRange = document.getElementById('line-width-range');
 const blurRange = document.getElementById('blur-range');
 const lineDecayRange = document.getElementById('line-decay-range');
@@ -41,6 +47,30 @@ function showArcSettings() {
     arcSettingsContainer.style.gridColumn = '1';
     shadowSettingsContainer.style.gridColumn = '2';
 }
+
+export let shadowOffset = 0;
+shadowOffsetRange.value = shadowOffset;
+shadowOffsetRange.addEventListener('change', updateShadowOffset);
+function updateShadowOffset(e) {
+    shadowOffset = e.target.value;
+}
+
+export let shadowBlur = 0;
+shadowBlurRange.value = shadowBlur;
+shadowBlurRange.addEventListener('change', updateShadowBlur);
+function updateShadowBlur(e) {
+    shadowBlur = e.target.value;
+}
+
+export let shadowColor = 'FFFFFF';
+shadowColorPicker.value = shadowColor;
+shadowColorPicker.addEventListener('input', updateShadowColor);
+function updateShadowColor(e) {
+    shadowColor = e.target.value;
+}
+
+ShadowColorRandomizeCheckbox.addEventListener('change', switchShadowColorRandomizing);
+function switchShadowColorRandomizing(e) {}
 
 export let blur = 3;
 blurRange.value = blur;

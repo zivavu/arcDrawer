@@ -1,4 +1,15 @@
-import { arcColor, blur, lineDecay, lineWidth, offsetWeight, previousOffsetMultiplier, strokesNumber } from './settings.js';
+import {
+    arcColor,
+    blur,
+    lineDecay,
+    lineWidth,
+    offsetWeight,
+    previousOffsetMultiplier,
+    shadowBlur,
+    shadowColor,
+    shadowOffset,
+    strokesNumber,
+} from './settings.js';
 
 const container = document.getElementById('canvas-container');
 const settingsMenuElement = document.getElementById('settings-menu');
@@ -34,10 +45,10 @@ function draw() {
     ctx.strokeStyle = arcColor;
     ctx.beginPath();
     ctx.filter = `blur(${blur}px)`;
-    ctx.shadowColor = 'black';
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-    ctx.shadowBlur = 0;
+    ctx.shadowColor = shadowColor;
+    ctx.shadowOffsetX = shadowOffset;
+    ctx.shadowOffsetY = shadowOffset;
+    ctx.shadowBlur = shadowBlur;
     ctx.lineWidth = lineWidth;
     for (let i = 0; i < strokesNumber; i++) {
         ctx.lineWidth = ctx.lineWidth - ((previousLineWidth * Math.random()) / 3) * lineDecay;

@@ -100,15 +100,16 @@ hr {
     display: flex;
     align-items: center;
     flex-direction: column;
+    justify-content: space-between;
     background-color: rgb(15, 15, 15);
     z-index: 1;
 }
 #arc-settings {
-    grid-column: 1;
+    grid-column: 2;
     grid-row: 1;
 }
 #shadow-settings {
-    grid-column: 2;
+    grid-column: 1;
     grid-row: 1;
 }
 
