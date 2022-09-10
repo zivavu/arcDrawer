@@ -4,17 +4,20 @@ const settingsCloseButton = document.getElementById('settings-hide-button');
 const settingsMenuElement = document.getElementById('settings-menu');
 const settingsArcButton = document.getElementById('arc-settings-button');
 const settingsShadowButton = document.getElementById('shadow-settings-button');
+const arcSettingsContainer = document.getElementById('arc-settings');
+const shadowSettingsContainer = document.getElementById('shadow-settings');
 
 const lineWidthRange = document.getElementById('line-width-range');
 const blurRange = document.getElementById('blur-range');
+const lineDecayRange = document.getElementById('line-decay-range');
 const prevOffsetMultiplierRange = document.getElementById('prev-offset-multiplier-range');
 const strokesNumberRange = document.getElementById('strokes-number-range');
 const offsetWeightRange = document.getElementById('offset-weight-range');
 
 const colorInput = document.getElementById('color-picker');
 
-const savedArcsContainer = document.getElementById('saved-arcs');
-const saveArcButton = document.getElementById('save-arc-button');
+const savedArcsContainer = document.getElementById('saved-brushes');
+const saveBrushButton = document.getElementById('save-brush-button');
 
 setingsOpenButton.addEventListener('click', showSettingsMenu);
 function showSettingsMenu() {
@@ -28,8 +31,16 @@ function hideSettingsMenu() {
     settingsMenuElement.style.animationFillMode = 'forwards';
 }
 
-settingsShadowButton.addEventListener('click', showShadowSettings());
-function showShadowSettings() {}
+settingsShadowButton.addEventListener('click', showShadowSettings);
+function showShadowSettings() {
+    shadowSettingsContainer.style.gridColumn = '1';
+    arcSettingsContainer.style.gridColumn = '2';
+}
+settingsArcButton.addEventListener('click', showArcSettings);
+function showArcSettings() {
+    arcSettingsContainer.style.gridColumn = '1';
+    shadowSettingsContainer.style.gridColumn = '2';
+}
 
 export let blur = 3;
 blurRange.value = blur;
@@ -41,6 +52,7 @@ export let previousOffsetMultiplier = 1.3;
 prevOffsetMultiplierRange.value = previousOffsetMultiplier;
 prevOffsetMultiplierRange.addEventListener('change', updatePrevOffsetMultiplier);
 function updatePrevOffsetMultiplier(e) {
+    console.log(prevOffsetMultiplierRange.value);
     previousOffsetMultiplier = e.target.value;
 }
 export let lineWidth = 1;
@@ -49,8 +61,14 @@ lineWidthRange.addEventListener('change', updateLineWidth);
 
 function updateLineWidth(e) {
     let withInput = e.target.value;
-    if (withInput > 1) withInput = Math.pow(withInput, 5);
+    if (withInput > 1) withInput = Math.pow(withInput, 4);
     lineWidth = withInput;
+}
+export let lineDecay = 0;
+lineDecayRange.value = lineDecay;
+lineDecayRange.addEventListener('change', updateLineDecay);
+function updateLineDecay(e) {
+    lineDecay = e.target.value;
 }
 
 export let strokesNumber = 7;
@@ -75,25 +93,26 @@ function updateArcColor(e) {
 }
 
 let arcArr = [];
-saveArcButton.addEventListener('click', saveArc);
-function saveArc() {
-    let arc = {
+saveBrushButton.addEventListener('click', saveBrush);
+function saveBrush() {
+    let brush = {
         number: arcArr.length,
         lineWidth: lineWidth,
         strokesNumber: strokesNumber,
+        lineDecay: lineDecay,
         offsetWeight: offsetWeight,
         previousOffsetMultiplier: previousOffsetMultiplier,
         blur: blur,
         arcColor: arcColor,
         node: document.createElement('div'),
     };
-    arcArr.push(arc);
-    arc.node.classList.add('saved-arc');
-    arc.node.innerText = arcArr.length;
-    anotherSavedArcsRowCheck();
-    showSavedArcs();
+    arcArr.push(brush);
+    brush.node.classList.add('saved-brush');
+    brush.node.innerText = arcArr.length;
+    anotherSavedBrushRowCheck();
+    showSavedBrushes();
 }
-function showSavedArcs() {
+function showSavedBrushes() {
     arcArr.forEach((arc) => {
         arc.node.style.backgroundColor = arc.arcColor;
         savedArcsContainer.appendChild(arc.node);
@@ -101,7 +120,7 @@ function showSavedArcs() {
     });
 }
 let currentRows = 0;
-function anotherSavedArcsRowCheck() {
+function anotherSavedBrushRowCheck() {
     if (Math.ceil(arcArr.length / 4) > currentRows) {
         currentRows++;
         savedArcsContainer.style.gridTemplateRows = `repeat(${currentRows}, 5h)`;
@@ -115,6 +134,7 @@ function selectBrush(e) {
     blur = selectedBrush.blur;
     previousOffsetMultiplier = selectedBrush.previousOffsetMultiplier;
     offsetWeight = selectedBrush.offsetWeight;
+    lineDecay = selectedBrush.lineDecay;
     lineWidth = selectedBrush.lineWidth;
     strokesNumber = selectedBrush.strokesNumber;
     arcColor = selectedBrush.arcColor;
@@ -122,6 +142,7 @@ function selectBrush(e) {
     blurRange.value = selectedBrush.blur;
     prevOffsetMultiplierRange.value = selectedBrush.previousOffsetMultiplier;
     offsetWeightRange.value = selectedBrush.offsetWeight;
+    lineDecayRange.value = selectedBrush.lineDecay;
     lineWidthRange.value = selectedBrush.lineWidth;
     strokesNumberRange.value = selectedBrush.strokesNumber;
     colorInput.value = selectedBrush.arcColor;

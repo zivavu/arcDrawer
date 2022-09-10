@@ -7,6 +7,7 @@ body {
     background-color: rgb(0, 0, 0);
     overflow: hidden;
 }
+
 #canvas-container {
     position: relative;
     height: 100vh;
@@ -64,14 +65,11 @@ body {
     background-color: rgb(15, 15, 15);
     z-index: 1;
 }
-#arc-settings {
+hr {
+    border: 0.1vh solid white;
+    color: white;
     width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    background-color: rgb(15, 15, 15);
-    z-index: 1;
+    margin: 1vmin 0;
 }
 @keyframes settings-forward {
     from {
@@ -89,6 +87,31 @@ body {
         right: -25vmin;
     }
 }
+#sub-settings-container {
+    display: grid;
+    width: 100%;
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, 25vmin);
+    overflow: hidden;
+}
+.sub-settings {
+    width: 100%;
+    height: auto;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background-color: rgb(15, 15, 15);
+    z-index: 1;
+}
+#arc-settings {
+    grid-column: 1;
+    grid-row: 1;
+}
+#shadow-settings {
+    grid-column: 2;
+    grid-row: 1;
+}
+
 #settings-hide-button {
     z-index: 2;
     position: absolute;
@@ -107,29 +130,30 @@ body {
 #settings-hide-button:hover {
     background-color: rgb(22, 61, 95);
     box-shadow: inset 0 0 1vmin 0.4vmin rgb(0, 44, 82);
-    text-shadow: none;
+    text-shadow: 0 0 0.5vmin white;
 }
 input[type='range'] {
     width: 80%;
 }
-input[type='button'] {
-    height: 4vmin;
+#save-brush-button {
+    position: relative;
+    height: 5vmin;
     margin-top: 2.5vmin;
     width: 80%;
     font-size: 2.5vmin;
     background-color: rgb(98, 98, 255);
-    box-shadow: 0 0 0.1vmin 0.4vmin rgb(33, 33, 223);
+    box-shadow: 0 0 0.1vmin 0.2vmin rgb(33, 33, 223), inset 0 0 0.2vmin 0.1vmin rgb(10, 10, 110);
     border: none;
-    border-radius: 3vmin;
+    border-radius: 1vmin;
     color: white;
-    line-height: 4vmin;
+    line-height: 5vmin;
     font-size: 3vmin;
     font-weight: 500;
     text-shadow: 0 0 0.1vmin white;
 }
-input[type='button']:hover {
+#save-brush-button:hover {
     background-color: rgb(73, 73, 255);
-    box-shadow: 0 0 0.6vmin 0.5vmin rgb(15, 15, 177);
+    box-shadow: 0 0 0.4vmin 0.3vmin rgb(13, 13, 102), inset 0 0 0.8vmin 0.5vmin rgb(11, 11, 138);
     text-shadow: 0 0 0.3vmin white;
 }
 label {
@@ -138,12 +162,15 @@ label {
     text-align: center;
     font-size: 2.5vmin;
     color: white;
-    padding-top: 2.5vmin;
+    padding: 0.7vh 0;
 }
 #color-picker {
     width: 80%;
 }
 #aspects {
+    box-sizing: border-box;
+    border: 0.25vh solid rgb(195, 178, 255);
+    border-radius: 0.3vh;
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -156,19 +183,21 @@ label {
     background-color: rgb(98, 98, 255);
     box-sizing: border-box;
     border: none;
-    border-left: 0.3vh solid rgb(15, 15, 15);
     color: white;
     line-height: 4vmin;
     font-size: 2vmin;
     font-weight: 500;
-    text-shadow: 0 0 0.1vmin white;
+    text-shadow: 0 0 0.2vmin white;
+}
+#aspects button:first-of-type {
+    border-right: 0.3vh solid rgb(56, 48, 211);
 }
 #aspects button:hover {
     background-color: rgb(73, 73, 255);
     box-shadow: inset 0 0 0.6vmin 0.2vmin rgb(15, 15, 177);
     text-shadow: 0 0 0.3vmin white;
 }
-#saved-arcs {
+#saved-brushes {
     box-sizing: border-box;
     box-shadow: inset 0 0 0.8vh 0.7vh black;
     margin-top: 2vh;
@@ -179,7 +208,7 @@ label {
     grid-template-columns: repeat(4, 25%);
     background-color: rgb(44, 44, 136);
 }
-.saved-arc {
+.saved-brush {
     background-color: rgb(98, 98, 255);
     color: white;
     width: 100%;
@@ -190,7 +219,7 @@ label {
     box-shadow: inset 0 0 1vh 0.3vh black, 0 0 1vh 0.3vh black;
     user-select: none;
 }
-.saved-arc:hover {
+.saved-brush:hover {
     z-index: 3;
     background-color: rgb(73, 73, 255);
     box-shadow: inset 0 0 1vmin 0.5vmin rgb(0, 0, 75), 0 0 0.6vh 0.6vh rgb(0, 0, 75);

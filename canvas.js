@@ -1,4 +1,4 @@
-import { arcColor, blur, lineWidth, offsetWeight, previousOffsetMultiplier, strokesNumber } from './settings.js';
+import { arcColor, blur, lineDecay, lineWidth, offsetWeight, previousOffsetMultiplier, strokesNumber } from './settings.js';
 
 const container = document.getElementById('canvas-container');
 const settingsMenuElement = document.getElementById('settings-menu');
@@ -30,7 +30,7 @@ function draw() {
         y: mouse.y,
     };
     let previousOffset = { x: 0, y: 0 };
-
+    let previousLineWidth = 0;
     ctx.strokeStyle = arcColor;
     ctx.beginPath();
     ctx.filter = `blur(${blur}px)`;
@@ -38,8 +38,9 @@ function draw() {
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
     ctx.shadowBlur = 0;
+    ctx.lineWidth = lineWidth;
     for (let i = 0; i < strokesNumber; i++) {
-        ctx.lineWidth = Math.random() * lineWidth;
+        ctx.lineWidth = ctx.lineWidth - ((previousLineWidth * Math.random()) / 3) * lineDecay;
         ctx.moveTo(previousPos.x, previousPos.y);
         let offset = {
             x: Math.random() * offsetWeight - offsetWeight / 2,
@@ -58,6 +59,7 @@ function draw() {
             x: offset.x + previousOffset.x * previousOffsetMultiplier,
             y: offset.y + previousOffset.y * previousOffsetMultiplier,
         };
+        previousLineWidth = ctx.lineWidth;
     }
     ctx.closePath();
     ctx.fillStyle = 'rgba(0, 0, 0, 0.001)';
