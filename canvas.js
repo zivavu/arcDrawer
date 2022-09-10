@@ -7,7 +7,8 @@ import {
     previousOffsetMultiplier,
     shadowBlur,
     shadowColor,
-    shadowOffset,
+    shadowXOffset,
+    shadowYOffset,
     strokesNumber,
 } from './settings.js';
 
@@ -46,8 +47,8 @@ function draw() {
     ctx.beginPath();
     ctx.filter = `blur(${blur}px)`;
     ctx.shadowColor = shadowColor;
-    ctx.shadowOffsetX = shadowOffset;
-    ctx.shadowOffsetY = shadowOffset;
+    ctx.shadowOffsetX = shadowXOffset;
+    ctx.shadowOffsetY = shadowYOffset;
     ctx.shadowBlur = shadowBlur;
     ctx.lineWidth = lineWidth;
     for (let i = 0; i < strokesNumber; i++) {

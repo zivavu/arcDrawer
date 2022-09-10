@@ -1,4 +1,6 @@
 import { clearAllCanvas, undo } from './canvas.js';
+const canvasContainer = document.createElement('container');
+
 const setingsOpenButton = document.getElementById('settings-show-button');
 const settingsCloseButton = document.getElementById('settings-hide-button');
 const settingsMenuElement = document.getElementById('settings-menu');
@@ -12,7 +14,6 @@ const shadowBlurRange = document.getElementById('shadow-blur-range');
 const shadowColorPicker = document.getElementById('shadow-color-picker');
 const ShadowColorRandomizeCheckbox = document.getElementById('shadow-color-randomize-checkbox');
 
-console.log(shadowOffsetRange, shadowBlurRange, shadowColorPicker, ShadowColorRandomizeCheckbox);
 const lineWidthRange = document.getElementById('line-width-range');
 const blurRange = document.getElementById('blur-range');
 const lineDecayRange = document.getElementById('line-decay-range');
@@ -48,11 +49,14 @@ function showArcSettings() {
     shadowSettingsContainer.style.gridColumn = '2';
 }
 
-export let shadowOffset = 0;
-shadowOffsetRange.value = shadowOffset;
+export let shadowBaseOffset = 60,
+    shadowYOffset = 0,
+    shadowXOffset = 0;
+
+shadowOffsetRange.value = shadowBaseOffset;
 shadowOffsetRange.addEventListener('change', updateShadowOffset);
 function updateShadowOffset(e) {
-    shadowOffset = e.target.value;
+    shadowBaseOffset = e.target.value;
 }
 
 export let shadowBlur = 0;
@@ -62,10 +66,11 @@ function updateShadowBlur(e) {
     shadowBlur = e.target.value;
 }
 
-export let shadowColor = 'FFFFFF';
+export let shadowColor = '#FFFFFF';
 shadowColorPicker.value = shadowColor;
 shadowColorPicker.addEventListener('input', updateShadowColor);
 function updateShadowColor(e) {
+    console.log(e.target.value);
     shadowColor = e.target.value;
 }
 
@@ -198,5 +203,30 @@ window.onkeydown = (e) => {
     if (e.key === 'c') {
         e.preventDefault();
         colorInput.showPicker();
+    }
+};
+
+document.onkeydown = (e) => {
+    switch (e.key) {
+        case 'c':
+            e.preventDefault();
+            colorInput.showPicker();
+            break;
+        case 'ArrowUp':
+            shadowYOffset = -shadowBaseOffset;
+            shadowXOffset = 0;
+            break;
+        case 'ArrowDown':
+            shadowYOffset = shadowBaseOffset;
+            shadowXOffset = 0;
+            break;
+        case 'ArrowLeft':
+            shadowXOffset = -shadowBaseOffset;
+            shadowYOffset = 0;
+            break;
+        case 'ArrowRight':
+            shadowXOffset = shadowBaseOffset;
+            shadowYOffset = 0;
+            break;
     }
 };
