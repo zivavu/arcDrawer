@@ -22,6 +22,7 @@ let canvasArr = [canvas];
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+window.onresize = setDimentions();
 function setDimentions() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;

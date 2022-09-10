@@ -70,7 +70,6 @@ export let shadowColor = '#FFFFFF';
 shadowColorPicker.value = shadowColor;
 shadowColorPicker.addEventListener('input', updateShadowColor);
 function updateShadowColor(e) {
-    console.log(e.target.value);
     shadowColor = e.target.value;
 }
 
@@ -139,6 +138,9 @@ function saveBrush() {
         previousOffsetMultiplier: previousOffsetMultiplier,
         blur: blur,
         arcColor: arcColor,
+        shadowBaseOffset: shadowBaseOffset,
+        shadowBlur: shadowBlur,
+        shadowColor: shadowColor,
         node: document.createElement('div'),
     };
     brushArr.push(brush);
@@ -172,6 +174,8 @@ function selectBrush(e) {
     lineWidth = selectedBrush.lineWidth;
     strokesNumber = selectedBrush.strokesNumber;
     arcColor = selectedBrush.arcColor;
+    shadowBaseOffset = selectedBrush.shadowBaseOffset;
+    shadowBlur = selectedBrush.shadowBlur;
 
     blurRange.value = selectedBrush.blur;
     prevOffsetMultiplierRange.value = selectedBrush.previousOffsetMultiplier;
@@ -179,7 +183,9 @@ function selectBrush(e) {
     lineDecayRange.value = selectedBrush.lineDecay;
     lineWidthRange.value = selectedBrush.lineWidth;
     strokesNumberRange.value = selectedBrush.strokesNumber;
-    colorInput.value = selectedBrush.arcColor;
+    shadowColorPicker.value = selectedBrush.shadowColor;
+    shadowOffsetRange.value = selectedBrush.shadowBaseOffset;
+    shadowBlurRange.value = selectedBrush.shadowBlur;
 }
 
 function stylingSelectedBrust(selectedBrushNode) {
@@ -206,27 +212,52 @@ window.onkeydown = (e) => {
     }
 };
 
-document.onkeydown = (e) => {
-    switch (e.key) {
-        case 'c':
-            e.preventDefault();
-            colorInput.showPicker();
-            break;
-        case 'ArrowUp':
-            shadowYOffset = -shadowBaseOffset;
-            shadowXOffset = 0;
-            break;
-        case 'ArrowDown':
-            shadowYOffset = shadowBaseOffset;
-            shadowXOffset = 0;
-            break;
-        case 'ArrowLeft':
-            shadowXOffset = -shadowBaseOffset;
-            shadowYOffset = 0;
-            break;
-        case 'ArrowRight':
-            shadowXOffset = shadowBaseOffset;
-            shadowYOffset = 0;
-            break;
+//God have mercy
+var keyMap = new Map();
+document.onkeydown = onkeyup = function (e) {
+    if (!e.key.match(/Arrow/)) return;
+
+    keyMap.set(e.key, e.type == 'keydown');
+
+    let pressedKeys = 0;
+    keyMap.forEach((value) => {
+        if (value == true) pressedKeys++;
+    });
+    if (e.type == 'keyup') return;
+
+    if (keyMap.get('ArrowUp') && keyMap.get('ArrowLeft')) {
+        shadowYOffset = -shadowBaseOffset;
+        shadowXOffset = -shadowBaseOffset;
+    }
+    if (keyMap.get('ArrowDown') && keyMap.get('ArrowLeft')) {
+        shadowXOffset = -shadowBaseOffset;
+        shadowYOffset = shadowBaseOffset;
+    }
+    if (keyMap.get('ArrowUp') && keyMap.get('ArrowRight')) {
+        shadowXOffset = shadowBaseOffset;
+        shadowYOffset = -shadowBaseOffset;
+    }
+    if (keyMap.get('ArrowDown') && keyMap.get('ArrowRight')) {
+        shadowYOffset = shadowBaseOffset;
+        shadowXOffset = shadowBaseOffset;
+    }
+
+    if (pressedKeys >= 2) return;
+
+    if (keyMap.get('ArrowUp')) {
+        shadowYOffset = -shadowBaseOffset;
+        shadowXOffset = 0;
+    }
+    if (keyMap.get('ArrowDown')) {
+        shadowYOffset = shadowBaseOffset;
+        shadowXOffset = 0;
+    }
+    if (keyMap.get('ArrowLeft')) {
+        shadowXOffset = -shadowBaseOffset;
+        shadowYOffset = 0;
+    }
+    if (keyMap.get('ArrowRight')) {
+        shadowXOffset = shadowBaseOffset;
+        shadowYOffset = 0;
     }
 };
