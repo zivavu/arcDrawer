@@ -92,11 +92,11 @@ function updateArcColor(e) {
     arcColor = e.target.value;
 }
 
-let arcArr = [];
+let brushArr = [];
 saveBrushButton.addEventListener('click', saveBrush);
 function saveBrush() {
     let brush = {
-        number: arcArr.length,
+        number: brushArr.length,
         lineWidth: lineWidth,
         strokesNumber: strokesNumber,
         lineDecay: lineDecay,
@@ -106,22 +106,21 @@ function saveBrush() {
         arcColor: arcColor,
         node: document.createElement('div'),
     };
-    arcArr.push(brush);
+    brushArr.push(brush);
     brush.node.classList.add('saved-brush');
-    brush.node.innerText = arcArr.length;
+    brush.node.innerText = brushArr.length;
     anotherSavedBrushRowCheck();
     showSavedBrushes();
 }
 function showSavedBrushes() {
-    arcArr.forEach((arc) => {
-        arc.node.style.backgroundColor = arc.arcColor;
-        savedArcsContainer.appendChild(arc.node);
-        arc.node.addEventListener('click', selectBrush);
-    });
+    let newBrush = brushArr[brushArr.length - 1];
+    newBrush.node.style.backgroundColor = newBrush.arcColor;
+    savedArcsContainer.appendChild(newBrush.node);
+    newBrush.node.addEventListener('click', selectBrush);
 }
 let currentRows = 0;
 function anotherSavedBrushRowCheck() {
-    if (Math.ceil(arcArr.length / 4) > currentRows) {
+    if (Math.ceil(brushArr.length / 4) > currentRows) {
         currentRows++;
         savedArcsContainer.style.gridTemplateRows = `repeat(${currentRows}, 5h)`;
     }
@@ -129,9 +128,9 @@ function anotherSavedBrushRowCheck() {
 
 function selectBrush(e) {
     let brushNumber = e.target.innerText * 1;
-    let selectedBrush = arcArr[brushNumber - 1];
+    let selectedBrush = brushArr[brushNumber - 1];
+    stylingSelectedBrust(e.target);
 
-    blur = selectedBrush.blur;
     previousOffsetMultiplier = selectedBrush.previousOffsetMultiplier;
     offsetWeight = selectedBrush.offsetWeight;
     lineDecay = selectedBrush.lineDecay;
@@ -146,6 +145,13 @@ function selectBrush(e) {
     lineWidthRange.value = selectedBrush.lineWidth;
     strokesNumberRange.value = selectedBrush.strokesNumber;
     colorInput.value = selectedBrush.arcColor;
+}
+
+function stylingSelectedBrust(selectedBrushNode) {
+    brushArr.forEach((brush) => {
+        brush.node.classList.remove('saved-brush-selected');
+    });
+    selectedBrushNode.classList.add('saved-brush-selected');
 }
 
 //// Shortcuts/////
