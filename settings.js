@@ -9,6 +9,7 @@ const settingsShadowButton = document.getElementById('shadow-settings-button');
 const arcSettingsContainer = document.getElementById('arc-settings');
 
 const shadowSettingsContainer = document.getElementById('shadow-settings');
+const shadowEnableCheckbox = document.getElementById('shadow-enable-checkbox');
 const shadowOffsetRange = document.getElementById('shadow-offset-range');
 const shadowBlurRange = document.getElementById('shadow-blur-range');
 const shadowColorPicker = document.getElementById('shadow-color-picker');
@@ -49,6 +50,12 @@ function showArcSettings() {
     shadowSettingsContainer.style.gridColumn = '2';
 }
 
+export let isShadowEnabled = false;
+shadowEnableCheckbox.addEventListener('change', shadowEnableSwitch);
+function shadowEnableSwitch(e) {
+    isShadowEnabled = e.target.checked;
+}
+
 export let shadowBaseOffset = 60,
     shadowYOffset = 0,
     shadowXOffset = 0;
@@ -86,7 +93,6 @@ export let previousOffsetMultiplier = 1.3;
 prevOffsetMultiplierRange.value = previousOffsetMultiplier;
 prevOffsetMultiplierRange.addEventListener('change', updatePrevOffsetMultiplier);
 function updatePrevOffsetMultiplier(e) {
-    console.log(prevOffsetMultiplierRange.value);
     previousOffsetMultiplier = e.target.value;
 }
 export let lineWidth = 1;
@@ -98,7 +104,7 @@ function updateLineWidth(e) {
     if (withInput > 1) withInput = Math.pow(withInput, 4);
     lineWidth = withInput;
 }
-export let lineDecay = 0;
+export let lineDecay = 1.5;
 lineDecayRange.value = lineDecay;
 lineDecayRange.addEventListener('change', updateLineDecay);
 function updateLineDecay(e) {

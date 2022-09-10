@@ -10,6 +10,7 @@ import {
     shadowXOffset,
     shadowYOffset,
     strokesNumber,
+    isShadowEnabled,
 } from './settings.js';
 
 const container = document.getElementById('canvas-container');
@@ -22,7 +23,7 @@ let canvasArr = [canvas];
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-window.onresize = setDimentions();
+window.addEventListener('resize', setDimentions);
 function setDimentions() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -47,10 +48,12 @@ function draw() {
     ctx.strokeStyle = arcColor;
     ctx.beginPath();
     ctx.filter = `blur(${blur}px)`;
-    ctx.shadowColor = shadowColor;
-    ctx.shadowOffsetX = shadowXOffset;
-    ctx.shadowOffsetY = shadowYOffset;
-    ctx.shadowBlur = shadowBlur;
+    if (isShadowEnabled) {
+        ctx.shadowColor = shadowColor;
+        ctx.shadowOffsetX = shadowXOffset;
+        ctx.shadowOffsetY = shadowYOffset;
+        ctx.shadowBlur = shadowBlur;
+    }
     ctx.lineWidth = lineWidth;
     for (let i = 0; i < strokesNumber; i++) {
         ctx.lineWidth = ctx.lineWidth - ((previousLineWidth * Math.random()) / 3) * lineDecay;
@@ -115,7 +118,8 @@ function newRestorePoint() {
     mouseHolding = false;
     canvas = document.createElement('canvas');
     ctx = canvas.getContext('2d');
-    setDimentions();
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     canvas.classList.add('canvas');
     container.appendChild(canvas);
     canvasArr.push(canvas);
