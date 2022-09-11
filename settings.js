@@ -229,6 +229,7 @@ document.onkeydown = onkeyup = function (e) {
     keyMap.forEach((value) => {
         if (value == true) pressedKeys++;
     });
+
     if (e.type == 'keyup') return;
 
     if (keyMap.get('ArrowUp') && keyMap.get('ArrowLeft')) {

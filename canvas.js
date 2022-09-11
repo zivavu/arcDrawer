@@ -1,6 +1,7 @@
 import {
     arcColor,
     blur,
+    isShadowEnabled,
     lineDecay,
     lineWidth,
     offsetWeight,
@@ -10,7 +11,6 @@ import {
     shadowXOffset,
     shadowYOffset,
     strokesNumber,
-    isShadowEnabled,
 } from './settings.js';
 
 const container = document.getElementById('canvas-container');
@@ -35,6 +35,10 @@ let mouse = {
 };
 
 function draw() {
+    let offScreenCanvas = document.createElement('canvas');
+    let offCtx = offScreenCanvas.getContext('2d');
+    offScreenCanvas.width = canvas.width;
+    offScreenCanvas.height = canvas.height;
     let currentPos = {
         x: mouse.x,
         y: mouse.y,
@@ -45,28 +49,28 @@ function draw() {
     };
     let previousOffset = { x: 0, y: 0 };
     let previousLineWidth = 0;
-    ctx.strokeStyle = arcColor;
-    ctx.beginPath();
-    ctx.filter = `blur(${blur}px)`;
+    offCtx.strokeStyle = arcColor;
+    offCtx.beginPath();
+    offCtx.filter = `blur(${blur}px)`;
     if (isShadowEnabled) {
-        ctx.shadowColor = shadowColor;
-        ctx.shadowOffsetX = shadowXOffset;
-        ctx.shadowOffsetY = shadowYOffset;
-        ctx.shadowBlur = shadowBlur;
+        offCtx.shadowColor = shadowColor;
+        offCtx.shadowOffsetX = shadowXOffset;
+        offCtx.shadowOffsetY = shadowYOffset;
+        offCtx.shadowBlur = shadowBlur;
     }
-    ctx.lineWidth = lineWidth;
+    offCtx.lineWidth = lineWidth;
     for (let i = 0; i < strokesNumber; i++) {
-        ctx.lineWidth = ctx.lineWidth - ((previousLineWidth * Math.random()) / 3) * lineDecay;
-        ctx.moveTo(previousPos.x, previousPos.y);
+        offCtx.lineWidth = offCtx.lineWidth - ((previousLineWidth * Math.random()) / 3) * lineDecay;
+        offCtx.moveTo(previousPos.x, previousPos.y);
         let offset = {
             x: Math.random() * offsetWeight - offsetWeight / 2,
             y: Math.random() * offsetWeight - offsetWeight / 2,
         };
-        ctx.lineTo(
+        offCtx.lineTo(
             currentPos.x + offset.x + previousOffset.x * previousOffsetMultiplier,
             currentPos.y + offset.y + previousOffset.y * previousOffsetMultiplier
         );
-        ctx.stroke();
+        offCtx.stroke();
         previousPos = {
             x: currentPos.x + offset.x + previousOffset.x * previousOffsetMultiplier,
             y: currentPos.y + offset.y + previousOffset.y * previousOffsetMultiplier,
@@ -75,25 +79,13 @@ function draw() {
             x: offset.x + previousOffset.x * previousOffsetMultiplier,
             y: offset.y + previousOffset.y * previousOffsetMultiplier,
         };
-        previousLineWidth = ctx.lineWidth;
+        previousLineWidth = offCtx.lineWidth;
     }
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.001)';
-    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    offCtx.closePath();
+    offCtx.fillStyle = 'rgba(0, 0, 0, 0.001)';
+    offCtx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    ctx.drawImage(offScreenCanvas, 0, 0);
 }
-/////////////////// FIRST VERSION //////////////////////
-// let x = mouse.x,
-//     y = mouse.y;
-// width = Math.random() * 2,
-// height = Math.random() * 100;
-
-// ctx.save();
-// ctx.translate(x, y);
-// ctx.rotate(((Math.PI * 180) / Math.random()) * 25);
-// ctx.translate(-x, -y);
-// ctx.fillStyle = 'white';
-// ctx.fillRect(x, y, width, height);
-// ctx.restore();
 
 canvas.addEventListener('mousemove', updateMousePosition);
 canvas.addEventListener('mousedown', mouseHoldingOn);
