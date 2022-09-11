@@ -51,7 +51,6 @@ function draw() {
     let previousLineWidth = 0;
     offCtx.strokeStyle = arcColor;
     offCtx.beginPath();
-    offCtx.filter = `blur(${blur}px)`;
     if (isShadowEnabled) {
         offCtx.shadowColor = shadowColor;
         offCtx.shadowOffsetX = shadowXOffset;
@@ -82,9 +81,8 @@ function draw() {
         previousLineWidth = offCtx.lineWidth;
     }
     offCtx.closePath();
-    offCtx.fillStyle = 'rgba(0, 0, 0, 0.001)';
-    offCtx.fillRect(0, 0, window.innerWidth, window.innerHeight);
     ctx.drawImage(offScreenCanvas, 0, 0);
+    canvas.style.webkitFilter = `blur(${blur}px)`;
 }
 
 canvas.addEventListener('mousemove', updateMousePosition);
