@@ -52,6 +52,7 @@ function draw() {
         ctx.strokeStyle = newColor;
     } else ctx.strokeStyle = arcColor;
 
+    ctx.filter = `blur(${blur}px)`;
     ctx.beginPath();
 
     if (isShadowEnabled) {
@@ -86,10 +87,6 @@ function draw() {
     ctx.closePath();
 }
 
-function applyFilters(canvas) {
-    canvas.style.filter = `blur(${blur}px)`;
-}
-
 export function newShade(hexColor, magnitude) {
     let half = magnitude / 2;
     hexColor = hexColor.replace(`#`, ``);
@@ -122,7 +119,6 @@ container.addEventListener('mouseleave', (e) => {
 });
 
 function mouseHoldingOn() {
-    applyFilters(canvas);
     mouseHolding = true;
 }
 function updateMousePosition(e) {
@@ -140,7 +136,18 @@ function newRestorePoint() {
     container.appendChild(canvas);
     canvasArr.push(canvas);
     addCanvasListeners(canvas);
+    if (canvasArr.length >= 7) restorePointsLimiter();
 }
+function restorePointsLimiter() {
+    let firstCanvas = canvasArr[0];
+    let secondCanvas = canvasArr[1];
+    let secondCtx = secondCanvas.getContext('2d');
+    secondCtx.filter = 'none';
+    secondCtx.drawImage(firstCanvas, 0, 0);
+    firstCanvas.remove();
+    canvasArr.shift();
+}
+
 export function undo() {
     if (canvasArr[canvasArr.length - 2]) {
         canvasArr[canvasArr.length - 1].remove();
