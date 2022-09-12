@@ -1,6 +1,7 @@
 import {
     arcColor,
     blur,
+    colorRandomizeValue,
     isShadowEnabled,
     lineDecay,
     lineWidth,
@@ -35,10 +36,6 @@ let mouse = {
 };
 
 function draw() {
-    let offScreenCanvas = document.createElement('canvas');
-    let offCtx = offScreenCanvas.getContext('2d');
-    offScreenCanvas.width = canvas.width;
-    offScreenCanvas.height = canvas.height;
     let currentPos = {
         x: mouse.x,
         y: mouse.y,
@@ -49,27 +46,33 @@ function draw() {
     };
     let previousOffset = { x: 0, y: 0 };
     let previousLineWidth = 0;
-    offCtx.strokeStyle = arcColor;
-    offCtx.beginPath();
+
+    if (colorRandomizeValue > 0) {
+        let newColor = newShade(arcColor, colorRandomizeValue);
+        ctx.strokeStyle = newColor;
+    } else ctx.strokeStyle = arcColor;
+
+    ctx.beginPath();
+
     if (isShadowEnabled) {
-        offCtx.shadowColor = shadowColor;
-        offCtx.shadowOffsetX = shadowXOffset;
-        offCtx.shadowOffsetY = shadowYOffset;
-        offCtx.shadowBlur = shadowBlur;
+        ctx.shadowColor = shadowColor;
+        ctx.shadowOffsetX = shadowXOffset;
+        ctx.shadowOffsetY = shadowYOffset;
+        ctx.shadowBlur = shadowBlur;
     }
-    offCtx.lineWidth = lineWidth;
+    ctx.lineWidth = lineWidth;
     for (let i = 0; i < strokesNumber; i++) {
-        offCtx.lineWidth = offCtx.lineWidth - ((previousLineWidth * Math.random()) / 3) * lineDecay;
-        offCtx.moveTo(previousPos.x, previousPos.y);
+        ctx.lineWidth = ctx.lineWidth - ((previousLineWidth * Math.random()) / 3) * lineDecay;
+        ctx.moveTo(previousPos.x, previousPos.y);
         let offset = {
             x: Math.random() * offsetWeight - offsetWeight / 2,
             y: Math.random() * offsetWeight - offsetWeight / 2,
         };
-        offCtx.lineTo(
+        ctx.lineTo(
             currentPos.x + offset.x + previousOffset.x * previousOffsetMultiplier,
             currentPos.y + offset.y + previousOffset.y * previousOffsetMultiplier
         );
-        offCtx.stroke();
+        ctx.stroke();
         previousPos = {
             x: currentPos.x + offset.x + previousOffset.x * previousOffsetMultiplier,
             y: currentPos.y + offset.y + previousOffset.y * previousOffsetMultiplier,
@@ -78,11 +81,33 @@ function draw() {
             x: offset.x + previousOffset.x * previousOffsetMultiplier,
             y: offset.y + previousOffset.y * previousOffsetMultiplier,
         };
-        previousLineWidth = offCtx.lineWidth;
+        previousLineWidth = ctx.lineWidth;
     }
-    offCtx.closePath();
-    ctx.drawImage(offScreenCanvas, 0, 0);
-    canvas.style.webkitFilter = `blur(${blur}px)`;
+    ctx.closePath();
+}
+
+function applyFilters(canvas) {
+    canvas.style.filter = `blur(${blur}px)`;
+}
+
+export function newShade(hexColor, magnitude) {
+    let half = magnitude / 2;
+    hexColor = hexColor.replace(`#`, ``);
+    if (hexColor.length === 6) {
+        const decimalColor = parseInt(hexColor, 16);
+        let r = (decimalColor >> 16) + Math.round(Math.random() * magnitude) - half;
+        r > 255 && (r = 255);
+        r < 0 && (r = 0);
+        let g = (decimalColor & 0x0000ff) + Math.round(Math.random() * magnitude) - half;
+        g > 255 && (g = 255);
+        g < 0 && (g = 0);
+        let b = ((decimalColor >> 8) & 0x00ff) + Math.round(Math.random() * magnitude) - half;
+        b > 255 && (b = 255);
+        b < 0 && (b = 0);
+        return `#${(g | (b << 8) | (r << 16)).toString(16)}`;
+    } else {
+        return hexColor;
+    }
 }
 
 canvas.addEventListener('mousemove', updateMousePosition);
@@ -97,6 +122,7 @@ container.addEventListener('mouseleave', (e) => {
 });
 
 function mouseHoldingOn() {
+    applyFilters(canvas);
     mouseHolding = true;
 }
 function updateMousePosition(e) {

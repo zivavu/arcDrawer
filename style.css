@@ -136,6 +136,10 @@ hr {
 input[type='range'] {
     width: 80%;
 }
+input[type='checkbox'] {
+    width: 2vmin;
+    height: 2vmin;
+}
 #save-brush-button {
     position: relative;
     height: 5vmin;

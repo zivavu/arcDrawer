@@ -1,4 +1,4 @@
-import { clearAllCanvas, undo } from './canvas.js';
+import { clearAllCanvas, newShade, undo } from './canvas.js';
 const canvasContainer = document.createElement('container');
 
 const setingsOpenButton = document.getElementById('settings-show-button');
@@ -13,7 +13,7 @@ const shadowEnableCheckbox = document.getElementById('shadow-enable-checkbox');
 const shadowOffsetRange = document.getElementById('shadow-offset-range');
 const shadowBlurRange = document.getElementById('shadow-blur-range');
 const shadowColorPicker = document.getElementById('shadow-color-picker');
-const ShadowColorRandomizeCheckbox = document.getElementById('shadow-color-randomize-checkbox');
+const shadowColorFromArcCheckbox = document.getElementById('shadow-color-from-arc-checkbox');
 
 const lineWidthRange = document.getElementById('line-width-range');
 const blurRange = document.getElementById('blur-range');
@@ -23,6 +23,7 @@ const strokesNumberRange = document.getElementById('strokes-number-range');
 const offsetWeightRange = document.getElementById('offset-weight-range');
 
 const colorInput = document.getElementById('color-picker');
+const colorRandomizeRange = document.getElementById('color-randomize-range');
 
 const savedArcsContainer = document.getElementById('saved-brushes');
 const saveBrushButton = document.getElementById('save-brush-button');
@@ -51,10 +52,16 @@ function showArcSettings() {
 }
 
 export let isShadowEnabled = false;
+shadowEnableCheckbox.cheched = false;
 shadowEnableCheckbox.addEventListener('change', shadowEnableSwitch);
-function shadowEnableSwitch(e) {
-    isShadowEnabled = e.target.checked;
+function shadowEnableSwitch() {
+    isShadowEnabled = shadowEnableCheckbox.checked;
+    shadowBlurRange.disabled = !isShadowEnabled;
+    shadowColorPicker.disabled = !isShadowEnabled;
+    shadowColorFromArcCheckbox.disabled = !isShadowEnabled;
+    shadowOffsetRange.disabled = !isShadowEnabled;
 }
+shadowEnableSwitch();
 
 export let shadowBaseOffset = 60,
     shadowYOffset = 0,
@@ -80,8 +87,15 @@ function updateShadowColor(e) {
     shadowColor = e.target.value;
 }
 
-ShadowColorRandomizeCheckbox.addEventListener('change', switchShadowColorRandomizing);
-function switchShadowColorRandomizing(e) {}
+shadowColorFromArcCheckbox.checked = false;
+shadowColorFromArcCheckbox.addEventListener('change', shadowColorFromArc);
+function shadowColorFromArc(e) {
+    if (e.target.checked == true) {
+        shadowColorPicker.disabled = true;
+        shadowColor = newShade(arcColor, -70);
+        console.log(shadowColor, arcColor);
+    } else shadowColorPicker.disabled = false;
+}
 
 export let blur = 3;
 blurRange.value = blur;
@@ -125,11 +139,21 @@ function updateOffsetWeight(e) {
     offsetWeight = e.target.value;
 }
 
-export let arcColor = 'white';
-colorInput.value = '#FFFFFF';
+export let arcColor = '#FFFFFF';
+colorInput.value = arcColor;
 colorInput.addEventListener('change', updateArcColor);
 function updateArcColor(e) {
     arcColor = e.target.value;
+    if (shadowEnableCheckbox.checked && shadowColorFromArc.checked) {
+        shadowColor = newShade(arcColor, -70);
+    }
+}
+
+export let colorRandomizeValue = 0;
+colorRandomizeRange.value = colorRandomizeValue;
+colorRandomizeRange.addEventListener('change', setColorRandomize);
+function setColorRandomize(e) {
+    colorRandomizeValue = e.target.value;
 }
 
 let brushArr = [];
@@ -231,7 +255,6 @@ document.onkeydown = onkeyup = function (e) {
     });
 
     if (e.type == 'keyup') return;
-
     if (keyMap.get('ArrowUp') && keyMap.get('ArrowLeft')) {
         shadowYOffset = -shadowBaseOffset;
         shadowXOffset = -shadowBaseOffset;
