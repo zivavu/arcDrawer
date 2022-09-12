@@ -136,19 +136,33 @@ function newRestorePoint() {
     container.appendChild(canvas);
     canvasArr.push(canvas);
     addCanvasListeners(canvas);
-    if (canvasArr.length >= 7) restorePointsLimiter();
+    if (canvasArr.length >= 10) restorePointsLimiter();
 }
+let enableRestoreLimit = false;
 function restorePointsLimiter() {
+    enableRestoreLimit = true;
     let firstCanvas = canvasArr[0];
     let secondCanvas = canvasArr[1];
-    let secondCtx = secondCanvas.getContext('2d');
-    secondCtx.filter = 'none';
-    secondCtx.drawImage(firstCanvas, 0, 0);
-    firstCanvas.remove();
+
+    let tempCanvas = document.createElement('canvas');
+    tempCanvas.classList.add('canvas');
+
+    let tempCtx = tempCanvas.getContext('2d');
+    tempCanvas.width = window.innerWidth;
+    tempCanvas.height = window.innerHeight;
+
+    tempCtx.drawImage(firstCanvas, 0, 0);
+    tempCtx.drawImage(secondCanvas, 0, 0);
+
+    container.insertBefore(tempCanvas, container.firstChild);
     canvasArr.shift();
+    canvasArr[0] = tempCanvas;
+    firstCanvas.remove();
+    secondCanvas.remove();
 }
 
 export function undo() {
+    if (enableRestoreLimit && !canvasArr[canvasArr.length - 3]) return;
     if (canvasArr[canvasArr.length - 2]) {
         canvasArr[canvasArr.length - 1].remove();
         canvasArr.pop();
@@ -168,4 +182,5 @@ export function clearAllCanvas() {
     container.innerHTML = '';
     canvasArr = [];
     newRestorePoint();
+    enableRestoreLimit = false;
 }
