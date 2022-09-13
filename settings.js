@@ -1,4 +1,4 @@
-import { clearAllCanvas, newShade, undo } from './canvas.js';
+import { clearAllCanvas, undo } from './canvas.js';
 const canvasContainer = document.createElement('container');
 
 const setingsOpenButton = document.getElementById('settings-show-button');
@@ -23,7 +23,8 @@ const strokesNumberRange = document.getElementById('strokes-number-range');
 const offsetWeightRange = document.getElementById('offset-weight-range');
 
 const colorInput = document.getElementById('color-picker');
-const colorRandomizeRange = document.getElementById('color-randomize-range');
+const hueRandomizeRange = document.getElementById('hue-randomize-range');
+const saturationRange = document.getElementById('saturation-range');
 
 const savedArcsContainer = document.getElementById('saved-brushes');
 const saveBrushButton = document.getElementById('save-brush-button');
@@ -96,6 +97,26 @@ function shadowColorFromArc(e) {
         console.log(shadowColor, arcColor);
     } else shadowColorPicker.disabled = false;
 }
+function newShade(hexColor, magnitude) {
+    let half = magnitude / 2;
+    hexColor = hexColor.replace(`#`, ``);
+    if (hexColor.length === 6) {
+        const decimalColor = parseInt(hexColor, 16);
+        let r = (decimalColor >> 16) + Math.round(Math.random() * magnitude) - half;
+        r > 255 && (r = 255);
+        r < 0 && (r = 0);
+        let g = (decimalColor & 0x0000ff) + Math.round(Math.random() * magnitude) - half;
+        g > 255 && (g = 255);
+        g < 0 && (g = 0);
+        let b = ((decimalColor >> 8) & 0x00ff) + Math.round(Math.random() * magnitude) - half;
+        b > 255 && (b = 255);
+        b < 0 && (b = 0);
+        console.log(hexColor, `#${(g | (b << 8) | (r << 16)).toString(16)}`);
+        return `#${(g | (b << 8) | (r << 16)).toString(16)}`;
+    } else {
+        return hexColor;
+    }
+}
 
 export let blur = 3;
 blurRange.value = blur;
@@ -149,11 +170,18 @@ function updateArcColor(e) {
     }
 }
 
-export let colorRandomizeValue = 0;
-colorRandomizeRange.value = colorRandomizeValue;
-colorRandomizeRange.addEventListener('change', setColorRandomize);
+export let hueRandomize = 0;
+hueRandomizeRange.value = hueRandomize;
+hueRandomizeRange.addEventListener('change', setColorRandomize);
 function setColorRandomize(e) {
-    colorRandomizeValue = e.target.value;
+    hueRandomize = e.target.value;
+}
+
+export let saturation = 100;
+saturationRange.value = saturation;
+saturationRange.addEventListener('change', setSaturationRandomize);
+function setSaturationRandomize(e) {
+    saturation = e.target.value;
 }
 
 let brushArr = [];

@@ -53,7 +53,7 @@ body {
     border-color: rgb(208, 217, 255);
 }
 #settings-menu {
-    padding: 5vmin 0;
+    padding: 5vh 0;
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -69,7 +69,7 @@ hr {
     border: 0.1vh solid white;
     color: white;
     width: 98%;
-    margin: 1vmin 0;
+    margin: 0.5vh 0;
 }
 @keyframes settings-forward {
     from {
@@ -90,9 +90,11 @@ hr {
 #sub-settings-container {
     display: grid;
     width: 100%;
+    height: 65vh;
     grid-auto-flow: row;
     grid-template-columns: repeat(2, 25vmin);
     overflow: hidden;
+    word-break: keep-all;
 }
 .sub-settings {
     width: 100%;
@@ -134,25 +136,26 @@ hr {
     text-shadow: 0 0 0.5vmin white;
 }
 input[type='range'] {
+    margin: 0;
     width: 80%;
 }
+
 input[type='checkbox'] {
-    width: 2vmin;
-    height: 2vmin;
+    width: 2vh;
+    height: 2vh;
 }
 #save-brush-button {
     position: relative;
-    height: 5vmin;
-    margin-top: 2.5vmin;
+    height: 5.5vh;
+    margin-top: 2.5vh;
     width: 80%;
-    font-size: 2.5vmin;
+    font-size: 2.5vh;
     background-color: rgb(98, 98, 255);
     box-shadow: 0 0 0.1vmin 0.2vmin rgb(33, 33, 223), inset 0 0 0.2vmin 0.1vmin rgb(10, 10, 110);
     border: none;
     border-radius: 1vmin;
     color: white;
-    line-height: 5vmin;
-    font-size: 3vmin;
+    line-height: 5vh;
     font-weight: 500;
     text-shadow: 0 0 0.1vmin white;
 }
@@ -165,11 +168,12 @@ label {
     font-weight: 700;
     user-select: none;
     text-align: center;
-    font-size: 2.5vmin;
+    font-size: 2.5vh;
     color: white;
-    padding: 0.7vh 0;
+    padding: 0.5vh 0;
 }
 #color-picker {
+    height: 4vh;
     width: 80%;
 }
 #aspects {
@@ -184,16 +188,15 @@ label {
 #aspects button {
     height: 4vh;
     width: 50%;
-    font-size: 2.5vmin;
     background-color: rgb(98, 98, 255);
     background-color: #000000;
     box-sizing: border-box;
     border: none;
     color: white;
-    line-height: 4vmin;
-    font-size: 2vmin;
+    line-height: 4vh;
+    font-size: 2vh;
     font-weight: 500;
-    text-shadow: 0 0 0.2vmin white;
+    text-shadow: 0 0 0.2vh white;
 }
 #aspects button:first-of-type {
     border-right: 0.3vh solid rgb(56, 48, 211);
@@ -201,7 +204,7 @@ label {
 #aspects button:hover {
     background-color: rgb(73, 73, 255);
     box-shadow: inset 0 0 0.6vmin 0.2vmin rgb(15, 15, 177);
-    text-shadow: 0 0 0.3vmin white;
+    text-shadow: 0 0 0.3vh white;
 }
 #saved-brushes {
     box-sizing: border-box;
@@ -220,7 +223,7 @@ label {
     width: 100%;
     height: 100%;
     text-align: center;
-    line-height: 5vmin;
+    line-height: 5vh;
     font-size: 3vh;
     box-shadow: inset 0 0 1vh 0.3vh black, 0 0 1vh 0.3vh black;
     text-shadow: 0 0 0.6vmin black, 0 0.2vmin 0.6vmin black;

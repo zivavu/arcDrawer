@@ -1,12 +1,13 @@
 import {
     arcColor,
     blur,
-    colorRandomizeValue,
+    hueRandomize,
     isShadowEnabled,
     lineDecay,
     lineWidth,
     offsetWeight,
     previousOffsetMultiplier,
+    saturation,
     shadowBlur,
     shadowColor,
     shadowXOffset,
@@ -46,14 +47,13 @@ function draw() {
     };
     let previousOffset = { x: 0, y: 0 };
     let previousLineWidth = 0;
+    console.log(ctx.filter);
 
-    if (colorRandomizeValue > 0) {
-        let newColor = newShade(arcColor, colorRandomizeValue);
-        ctx.strokeStyle = newColor;
-    } else ctx.strokeStyle = arcColor;
+    let randomHueDeg = Math.round(Math.random() * hueRandomize) - hueRandomize / 2;
 
     ctx.filter = `blur(${blur}px)`;
-    ctx.beginPath();
+    ctx.filter += `hue-rotate(${randomHueDeg}deg)`;
+    ctx.filter += `saturate(${saturation}%)`;
 
     if (isShadowEnabled) {
         ctx.shadowColor = shadowColor;
@@ -61,6 +61,10 @@ function draw() {
         ctx.shadowOffsetY = shadowYOffset;
         ctx.shadowBlur = shadowBlur;
     }
+
+    ctx.strokeStyle = arcColor;
+    ctx.beginPath();
+
     ctx.lineWidth = lineWidth;
     for (let i = 0; i < strokesNumber; i++) {
         ctx.lineWidth = ctx.lineWidth - ((previousLineWidth * Math.random()) / 3) * lineDecay;
@@ -85,26 +89,6 @@ function draw() {
         previousLineWidth = ctx.lineWidth;
     }
     ctx.closePath();
-}
-
-export function newShade(hexColor, magnitude) {
-    let half = magnitude / 2;
-    hexColor = hexColor.replace(`#`, ``);
-    if (hexColor.length === 6) {
-        const decimalColor = parseInt(hexColor, 16);
-        let r = (decimalColor >> 16) + Math.round(Math.random() * magnitude) - half;
-        r > 255 && (r = 255);
-        r < 0 && (r = 0);
-        let g = (decimalColor & 0x0000ff) + Math.round(Math.random() * magnitude) - half;
-        g > 255 && (g = 255);
-        g < 0 && (g = 0);
-        let b = ((decimalColor >> 8) & 0x00ff) + Math.round(Math.random() * magnitude) - half;
-        b > 255 && (b = 255);
-        b < 0 && (b = 0);
-        return `#${(g | (b << 8) | (r << 16)).toString(16)}`;
-    } else {
-        return hexColor;
-    }
 }
 
 canvas.addEventListener('mousemove', updateMousePosition);
