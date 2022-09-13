@@ -4,6 +4,7 @@ App that lets you create fotorealistic stuff in few minutes(but is garbage anywa
 You kinda have to play with the arcs values to understand them
 
 Shortcuts:
+
 Ctrl + Z to undo last change
 
 Ctrl + C to change the arc color
