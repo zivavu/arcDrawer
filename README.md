@@ -12,3 +12,5 @@ Ctrl + C to change the arc color
 Ctrl + R to clear the drawing area
 
 Arrow keys are used to set the direction of shadow when it is enabled
+
+Sadly but blur works well only on Firefox browser atm
