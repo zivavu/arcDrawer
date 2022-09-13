@@ -47,7 +47,6 @@ function draw() {
     };
     let previousOffset = { x: 0, y: 0 };
     let previousLineWidth = 0;
-    console.log(ctx.filter);
 
     let randomHueDeg = Math.round(Math.random() * hueRandomize) - hueRandomize / 2;
 

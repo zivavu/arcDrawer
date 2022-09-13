@@ -53,7 +53,7 @@ function showArcSettings() {
 }
 
 export let isShadowEnabled = false;
-shadowEnableCheckbox.cheched = false;
+shadowEnableCheckbox.checked = isShadowEnabled;
 shadowEnableCheckbox.addEventListener('change', shadowEnableSwitch);
 function shadowEnableSwitch() {
     isShadowEnabled = shadowEnableCheckbox.checked;
@@ -93,25 +93,22 @@ shadowColorFromArcCheckbox.addEventListener('change', shadowColorFromArc);
 function shadowColorFromArc(e) {
     if (e.target.checked == true) {
         shadowColorPicker.disabled = true;
-        shadowColor = newShade(arcColor, -70);
-        console.log(shadowColor, arcColor);
+        shadowColor = newShade(arcColor, -50);
     } else shadowColorPicker.disabled = false;
 }
 function newShade(hexColor, magnitude) {
-    let half = magnitude / 2;
     hexColor = hexColor.replace(`#`, ``);
     if (hexColor.length === 6) {
         const decimalColor = parseInt(hexColor, 16);
-        let r = (decimalColor >> 16) + Math.round(Math.random() * magnitude) - half;
+        let r = (decimalColor >> 16) + magnitude;
         r > 255 && (r = 255);
         r < 0 && (r = 0);
-        let g = (decimalColor & 0x0000ff) + Math.round(Math.random() * magnitude) - half;
+        let g = (decimalColor & 0x0000ff) + magnitude;
         g > 255 && (g = 255);
         g < 0 && (g = 0);
-        let b = ((decimalColor >> 8) & 0x00ff) + Math.round(Math.random() * magnitude) - half;
+        let b = ((decimalColor >> 8) & 0x00ff) + magnitude;
         b > 255 && (b = 255);
         b < 0 && (b = 0);
-        console.log(hexColor, `#${(g | (b << 8) | (r << 16)).toString(16)}`);
         return `#${(g | (b << 8) | (r << 16)).toString(16)}`;
     } else {
         return hexColor;
@@ -165,8 +162,10 @@ colorInput.value = arcColor;
 colorInput.addEventListener('change', updateArcColor);
 function updateArcColor(e) {
     arcColor = e.target.value;
-    if (shadowEnableCheckbox.checked && shadowColorFromArc.checked) {
-        shadowColor = newShade(arcColor, -70);
+    if (shadowEnableCheckbox.checked && shadowColorFromArcCheckbox.checked) {
+        shadowColor = newShade(arcColor, -50);
+        shadowColorPicker.value = shadowColor;
+        ``;
     }
 }
 
