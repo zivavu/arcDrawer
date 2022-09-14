@@ -1,5 +1,6 @@
 # arcDrawer
-App that lets you create fotorealistic stuff in few minutes(but is garbage anyway)
+
+App that lets you create 'fotorealistic' stuff in few minutes(but is garbage anyway)
 
 You kinda have to play with the arcs values to understand them
 
