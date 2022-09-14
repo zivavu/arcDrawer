@@ -21,6 +21,8 @@ let canvas = document.querySelector('.canvas');
 let ctx = canvas.getContext('2d');
 const initialImage = new Image();
 initialImage.src = 'initial.jpg';
+initialImage.width = window.innerWidth;
+initialImage.height = window.innerHeight;
 initialImage.onload = () => {
     ctx.drawImage(initialImage, 0, 0, initialImage.width, initialImage.height);
     newRestorePoint();

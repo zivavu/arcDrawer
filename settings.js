@@ -186,6 +186,7 @@ function setSaturationRandomize(e) {
 let brushArr = [];
 saveBrushButton.addEventListener('click', saveBrush);
 function saveBrush() {
+    if (brushArr.length >= 8) return;
     let brush = {
         number: brushArr.length,
         lineWidth: lineWidth,
