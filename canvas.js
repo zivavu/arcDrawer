@@ -19,10 +19,11 @@ const container = document.getElementById('canvas-container');
 
 let canvas = document.querySelector('.canvas');
 let ctx = canvas.getContext('2d');
-const initialImage = new Image(window.innerWidth, window.innerHeight);
+const initialImage = new Image();
 initialImage.src = 'initial.jpg';
 initialImage.onload = () => {
-    ctx.drawImage(initialImage, 0, 0);
+    ctx.drawImage(initialImage, 0, 0, initialImage.width, initialImage.height);
+    newRestorePoint();
 };
 let canvasArr = [canvas];
 
