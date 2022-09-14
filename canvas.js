@@ -16,10 +16,14 @@ import {
 } from './settings.js';
 
 const container = document.getElementById('canvas-container');
-const settingsMenuElement = document.getElementById('settings-menu');
 
 let canvas = document.querySelector('.canvas');
 let ctx = canvas.getContext('2d');
+const initialImage = new Image(window.innerWidth, window.innerHeight);
+initialImage.src = 'initial.jpg';
+initialImage.onload = () => {
+    ctx.drawImage(initialImage, 0, 0);
+};
 let canvasArr = [canvas];
 
 canvas.width = window.innerWidth;

@@ -1,5 +1,5 @@
 import { clearAllCanvas, undo } from './canvas.js';
-const canvasContainer = document.createElement('container');
+const initialMesage = document.getElementById('initial-message');
 
 const setingsOpenButton = document.getElementById('settings-show-button');
 const settingsCloseButton = document.getElementById('settings-hide-button');
@@ -260,6 +260,7 @@ window.onkeydown = (e) => {
         undo();
     }
     if (e.key === 'r' && e.ctrlKey) {
+        if (initialMesage) initialMesage.remove();
         e.preventDefault();
         clearAllCanvas();
     }
