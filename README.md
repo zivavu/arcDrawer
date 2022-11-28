@@ -30,9 +30,9 @@ Ctrl + R to clear the drawing area
 Arrow keys are used to set the direction of shadow when it is enabled but that function turned out to be kinda pointless
 
 # artGallery
-
-![płyta cd](https://user-images.githubusercontent.com/107223633/204228228-7f4b94f6-9f15-4360-be8b-3ddb8ea5d54c.png)
-![Screenshot_2](https://user-images.githubusercontent.com/107223633/204228237-b75fb080-28d1-42d2-b258-98168af9effb.png)
-![Screenshot_4](https://user-images.githubusercontent.com/107223633/204228242-3afb7ca7-f3e1-424d-9457-992b4dbd5ba9.png)
-![gg (2)](https://user-images.githubusercontent.com/107223633/204228254-3b28c182-5828-4485-90a7-7ad578ca2e16.png)
-![gg (3)](https://user-images.githubusercontent.com/107223633/204228270-e0055ad4-180c-4695-8da6-4676c115c1b1.png)
+![](https://user-images.githubusercontent.com/107223633/204228237-b75fb080-28d1-42d2-b258-98168af9effb.png)
+![](https://user-images.githubusercontent.com/107223633/204234137-6f5e0e93-dfca-4268-aa0a-10b4ca3252a3.png)
+![](https://user-images.githubusercontent.com/107223633/204228254-3b28c182-5828-4485-90a7-7ad578ca2e16.png)
+![](https://user-images.githubusercontent.com/107223633/204228242-3afb7ca7-f3e1-424d-9457-992b4dbd5ba9.png)
+![](https://user-images.githubusercontent.com/107223633/204228270-e0055ad4-180c-4695-8da6-4676c115c1b1.png)
+![](https://user-images.githubusercontent.com/107223633/204228228-7f4b94f6-9f15-4360-be8b-3ddb8ea5d54c.png)
