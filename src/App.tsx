@@ -20,19 +20,21 @@ type UiControls = {
 	previousOffsetMultiplier: number;
 	color: string;
 	hueRandomize: number;
+	blurJitter: number;
 };
 
 const defaults: UiControls = {
-	blur: 0,
+	blur: 1,
 	saturation: 1,
 	hueOffset: 0,
-	strokesNumber: 80,
+	strokesNumber: 5,
 	lineWidth: 8,
 	lineDecay: 0.2,
 	offsetWeight: 40,
 	previousOffsetMultiplier: 0.8,
 	color: '#d7e7ff',
 	hueRandomize: 40,
+	blurJitter: 0.2,
 };
 
 function hexToRgba(hex: string): [number, number, number, number] {
@@ -76,7 +78,8 @@ function App() {
 		resize();
 		const loop = () => {
 			const u = uiRef.current;
-			painterRef.current?.present(u.blur, u.saturation, u.hueOffset);
+			// Per-line blur is handled in the brush shader; disable global blur here
+			painterRef.current?.present(0.0, u.saturation, u.hueOffset);
 			requestAnimationFrame(loop);
 		};
 		loop();
@@ -100,6 +103,8 @@ function App() {
 				previousOffsetMultiplier: ui.previousOffsetMultiplier,
 				color: hexToRgba(ui.color),
 				hueRandomize: ui.hueRandomize,
+				blurSigmaPx: ui.blur * scale,
+				blurJitter: ui.blurJitter,
 			};
 			painterRef.current?.paintStroke(last.x, last.y, settings);
 			lastPosRef.current = { x, y };
@@ -172,11 +177,11 @@ function App() {
 			/>
 
 			<div className="controls">
-				<label>Blur</label>
+				<label>Line Blur σ</label>
 				<input
 					type="range"
-					min={0}
-					max={6}
+					min={1}
+					max={10}
 					step={0.1}
 					value={ui.blur}
 					onChange={change('blur')}
@@ -205,7 +210,7 @@ function App() {
 				<label>Segments</label>
 				<input
 					type="range"
-					min={5}
+					min={2}
 					max={20}
 					step={1}
 					value={ui.strokesNumber}
@@ -215,8 +220,8 @@ function App() {
 				<label>Line Width</label>
 				<input
 					type="range"
-					min={0.5}
-					max={30}
+					min={1}
+					max={15}
 					step={0.5}
 					value={ui.lineWidth}
 					onChange={change('lineWidth')}
@@ -263,6 +268,16 @@ function App() {
 					step={1}
 					value={ui.hueRandomize}
 					onChange={change('hueRandomize')}
+				/>
+
+				<label>Blur Jitter</label>
+				<input
+					type="range"
+					min={0}
+					max={1}
+					step={0.01}
+					value={ui.blurJitter}
+					onChange={change('blurJitter')}
 				/>
 			</div>
 
