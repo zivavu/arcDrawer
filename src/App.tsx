@@ -1,35 +1,254 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+import { Painter, type StrokeSettings } from './gl/painter';
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+type UiControls = {
+	blur: number;
+	saturation: number;
+	hueOffset: number;
+	strokesNumber: number;
+	lineWidth: number;
+	lineDecay: number;
+	offsetWeight: number;
+	previousOffsetMultiplier: number;
+	color: string;
+	hueRandomize: number;
+};
+
+const defaults: UiControls = {
+	blur: 0,
+	saturation: 1,
+	hueOffset: 0,
+	strokesNumber: 80,
+	lineWidth: 8,
+	lineDecay: 0.2,
+	offsetWeight: 40,
+	previousOffsetMultiplier: 0.8,
+	color: '#d7e7ff',
+	hueRandomize: 40,
+};
+
+function hexToRgba(hex: string): [number, number, number, number] {
+	const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)!;
+	const r = parseInt(m[1], 16) / 255;
+	const g = parseInt(m[2], 16) / 255;
+	const b = parseInt(m[3], 16) / 255;
+	return [r, g, b, 1];
 }
 
-export default App
+function App() {
+	const canvasRef = useRef<HTMLCanvasElement | null>(null);
+	const painterRef = useRef<Painter | null>(null);
+	const [ui, setUi] = useState<UiControls>(defaults);
+	const [mouseHolding, setMouseHolding] = useState(false);
+	const lastPosRef = useRef<{ x: number; y: number } | null>(null);
+	const uiRef = useRef<UiControls>(ui);
+
+	// keep latest UI values for the render loop without re-creating the effect
+	useEffect(() => {
+		uiRef.current = ui;
+	}, [ui]);
+
+	useEffect(() => {
+		const canvas = canvasRef.current!;
+		const gl = canvas.getContext('webgl2', { premultipliedAlpha: false });
+		if (!gl) return;
+		const resize = () => {
+			const dpr = Math.min(2, window.devicePixelRatio || 1);
+			const w = Math.floor(canvas.clientWidth * dpr);
+			const h = Math.floor(canvas.clientHeight * dpr);
+			if (canvas.width !== w || canvas.height !== h) {
+				canvas.width = w;
+				canvas.height = h;
+				painterRef.current?.resize(w, h);
+			}
+		};
+		painterRef.current = new Painter(gl, canvas.width || 1, canvas.height || 1);
+		const ro = new ResizeObserver(resize);
+		ro.observe(canvas);
+		resize();
+		const loop = () => {
+			const u = uiRef.current;
+			painterRef.current?.present(u.blur, u.saturation, u.hueOffset);
+			requestAnimationFrame(loop);
+		};
+		loop();
+		return () => ro.disconnect();
+	}, []);
+
+	const onPointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+		const canvas = e.target as HTMLCanvasElement;
+		const rect = canvas.getBoundingClientRect();
+		const scale = canvas.width / rect.width;
+		const x = (e.clientX - rect.left) * scale;
+		const y = (e.clientY - rect.top) * scale;
+		if (mouseHolding) {
+			const last = lastPosRef.current || { x, y };
+			// scale-dependent stroke parameters (DPR aware)
+			const settings: StrokeSettings = {
+				strokesNumber: ui.strokesNumber,
+				baseLineWidth: ui.lineWidth * scale,
+				lineDecay: ui.lineDecay,
+				offsetWeight: ui.offsetWeight * scale,
+				previousOffsetMultiplier: ui.previousOffsetMultiplier,
+				color: hexToRgba(ui.color),
+				hueRandomize: ui.hueRandomize,
+			};
+			painterRef.current?.paintStroke(last.x, last.y, settings);
+			lastPosRef.current = { x, y };
+		}
+	};
+	const onPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+		const canvas = e.target as HTMLCanvasElement;
+		canvas.setPointerCapture(e.pointerId);
+		setMouseHolding(true);
+		painterRef.current?.captureRestorePoint(12);
+		const rect = canvas.getBoundingClientRect();
+		const scale = canvas.width / rect.width;
+		lastPosRef.current = {
+			x: (e.clientX - rect.left) * scale,
+			y: (e.clientY - rect.top) * scale,
+		};
+	};
+	const onPointerUp = () => {
+		setMouseHolding(false);
+		lastPosRef.current = null;
+	};
+
+	const change =
+		<K extends keyof UiControls>(k: K) =>
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const val = (
+				e.target.type === 'color' ? e.target.value : Number(e.target.value)
+			) as UiControls[K];
+			setUi((prev) => ({ ...prev, [k]: val }));
+		};
+
+	const undo = () => painterRef.current?.undo();
+	const clear = () => painterRef.current?.clear();
+	const saveImage = () => {
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+		const a = document.createElement('a');
+		a.href = canvas.toDataURL('image/png');
+		a.download = `arcdrawer_${Date.now()}.png`;
+		a.click();
+	};
+
+	return (
+		<div className="app-root">
+			<canvas
+				ref={canvasRef}
+				className="webgl-canvas"
+				onPointerMove={onPointerMove}
+				onPointerDown={onPointerDown}
+				onPointerUp={onPointerUp}
+				onPointerCancel={onPointerUp}
+			/>
+
+			<div className="controls">
+				<label>Blur</label>
+				<input
+					type="range"
+					min={0}
+					max={6}
+					step={0.1}
+					value={ui.blur}
+					onChange={change('blur')}
+				/>
+
+				<label>Saturation</label>
+				<input
+					type="range"
+					min={0}
+					max={2}
+					step={0.01}
+					value={ui.saturation}
+					onChange={change('saturation')}
+				/>
+
+				<label>Hue Offset</label>
+				<input
+					type="range"
+					min={-180}
+					max={180}
+					step={1}
+					value={ui.hueOffset}
+					onChange={change('hueOffset')}
+				/>
+
+				<label>Segments</label>
+				<input
+					type="range"
+					min={5}
+					max={20}
+					step={1}
+					value={ui.strokesNumber}
+					onChange={change('strokesNumber')}
+				/>
+
+				<label>Line Width</label>
+				<input
+					type="range"
+					min={0.5}
+					max={30}
+					step={0.5}
+					value={ui.lineWidth}
+					onChange={change('lineWidth')}
+				/>
+
+				<label>Line Decay</label>
+				<input
+					type="range"
+					min={0}
+					max={1}
+					step={0.01}
+					value={ui.lineDecay}
+					onChange={change('lineDecay')}
+				/>
+
+				<label>Offset Weight</label>
+				<input
+					type="range"
+					min={0}
+					max={120}
+					step={1}
+					value={ui.offsetWeight}
+					onChange={change('offsetWeight')}
+				/>
+
+				<label>Momentum</label>
+				<input
+					type="range"
+					min={0}
+					max={1.2}
+					step={0.01}
+					value={ui.previousOffsetMultiplier}
+					onChange={change('previousOffsetMultiplier')}
+				/>
+
+				<label>Color</label>
+				<input type="color" value={ui.color} onChange={change('color')} />
+
+				<label>Hue Rand</label>
+				<input
+					type="range"
+					min={0}
+					max={180}
+					step={1}
+					value={ui.hueRandomize}
+					onChange={change('hueRandomize')}
+				/>
+			</div>
+
+			<div className="toolbar">
+				<button onClick={undo}>Undo</button>
+				<button onClick={clear}>Clear</button>
+				<button onClick={saveImage}>Save PNG</button>
+			</div>
+		</div>
+	);
+}
+
+export default App;
