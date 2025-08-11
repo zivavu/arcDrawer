@@ -230,8 +230,8 @@ function App() {
 				<label>Line Decay</label>
 				<input
 					type="range"
-					min={0}
-					max={1}
+					min={0.1}
+					max={2}
 					step={0.01}
 					value={ui.lineDecay}
 					onChange={change('lineDecay')}

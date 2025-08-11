@@ -232,10 +232,10 @@ export class Painter {
 	private gaussLocDir: WebGLUniformLocation;
 	private gaussLocSigma: WebGLUniformLocation;
 
-  private composeProgram: WebGLProgram;
-  private composeGlowIntensity: WebGLUniformLocation;
-  private composeSat: WebGLUniformLocation;
-  private composeHue: WebGLUniformLocation;
+	private composeProgram: WebGLProgram;
+	private composeGlowIntensity: WebGLUniformLocation;
+	private composeSat: WebGLUniformLocation;
+	private composeHue: WebGLUniformLocation;
 
 	private target: RenderTarget;
 	private scratchA: RenderTarget;
@@ -302,15 +302,21 @@ export class Painter {
 		this.gaussLocDir = gl.getUniformLocation(this.gaussProgram, 'uDirection')!;
 		this.gaussLocSigma = gl.getUniformLocation(this.gaussProgram, 'uSigma')!;
 
-    this.target = createRenderTarget(gl, width, height);
+		this.target = createRenderTarget(gl, width, height);
 		this.scratchA = createRenderTarget(gl, width, height);
 		this.scratchB = createRenderTarget(gl, width, height);
 
-    // compose (base + glow)
-    this.composeProgram = createProgram(gl, BLIT_VS, COMPOSE_FS);
-    this.composeGlowIntensity = gl.getUniformLocation(this.composeProgram, 'uGlowIntensity')!;
-    this.composeSat = gl.getUniformLocation(this.composeProgram, 'uSaturation')!;
-    this.composeHue = gl.getUniformLocation(this.composeProgram, 'uHue')!;
+		// compose (base + glow)
+		this.composeProgram = createProgram(gl, BLIT_VS, COMPOSE_FS);
+		this.composeGlowIntensity = gl.getUniformLocation(
+			this.composeProgram,
+			'uGlowIntensity'
+		)!;
+		this.composeSat = gl.getUniformLocation(
+			this.composeProgram,
+			'uSaturation'
+		)!;
+		this.composeHue = gl.getUniformLocation(this.composeProgram, 'uHue')!;
 		this.clear();
 	}
 
