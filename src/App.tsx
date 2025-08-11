@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState, type ChangeEvent } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+	type ChangeEvent,
+} from 'react';
 import './App.css';
 
 import { Painter, type StrokeSettings } from './gl/painter';
@@ -125,8 +131,9 @@ function App() {
 			setUi((prev) => ({ ...prev, [k]: val }));
 		};
 
-	const undo = () => painterRef.current?.undo();
+	const undo = useCallback(() => painterRef.current?.undo(), []);
 	const clear = () => painterRef.current?.clear();
+	const redo = useCallback(() => painterRef.current?.redo(), []);
 	const saveImage = () => {
 		const canvas = canvasRef.current;
 		if (!canvas) return;
@@ -135,6 +142,23 @@ function App() {
 		a.download = `arcdrawer_${Date.now()}.png`;
 		a.click();
 	};
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.ctrlKey || e.metaKey) {
+				// Ctrl for Windows/Linux, Meta (Cmd) for Mac
+				if (e.key === 'z') {
+					e.preventDefault();
+					undo();
+				} else if (e.key === 'y') {
+					e.preventDefault();
+					redo();
+				}
+			}
+		};
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [undo, redo]);
 
 	return (
 		<div className="app-root">

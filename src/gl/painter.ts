@@ -162,6 +162,7 @@ export class Painter {
 
 	private target: RenderTarget;
 	private restore: RenderTarget[] = [];
+	private redoStack: RenderTarget[] = []; // Add redo stack
 
 	constructor(gl: WebGL2RenderingContext, width: number, height: number) {
 		this.gl = gl;
@@ -338,12 +339,85 @@ export class Painter {
 			gl.deleteFramebuffer(rt.fbo);
 			gl.deleteTexture(rt.tex);
 		}
+		this.redoStack = []; // Clear redo stack on new action
 	}
 
 	undo() {
 		const gl = this.gl;
 		if (this.restore.length === 0) return;
+		// Store current state for redo
+		const current = createRenderTarget(
+			gl,
+			this.target.width,
+			this.target.height
+		);
+		gl.bindFramebuffer(gl.READ_FRAMEBUFFER, this.target.fbo);
+		gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, current.fbo);
+		gl.blitFramebuffer(
+			0,
+			0,
+			this.target.width,
+			this.target.height,
+			0,
+			0,
+			current.width,
+			current.height,
+			gl.COLOR_BUFFER_BIT,
+			gl.NEAREST
+		);
+		gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
+		gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
+		this.redoStack.push(current);
+
 		const rt = this.restore.pop()!;
+		gl.bindFramebuffer(gl.READ_FRAMEBUFFER, rt.fbo);
+		gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, this.target.fbo);
+		gl.blitFramebuffer(
+			0,
+			0,
+			rt.width,
+			rt.height,
+			0,
+			0,
+			this.target.width,
+			this.target.height,
+			gl.COLOR_BUFFER_BIT,
+			gl.NEAREST
+		);
+		gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
+		gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
+		gl.deleteFramebuffer(rt.fbo);
+		gl.deleteTexture(rt.tex);
+	}
+
+	redo() {
+		const gl = this.gl;
+		if (this.redoStack.length === 0) return;
+		// Store current state for undo
+		const current = createRenderTarget(
+			gl,
+			this.target.width,
+			this.target.height
+		);
+		gl.bindFramebuffer(gl.READ_FRAMEBUFFER, this.target.fbo);
+		gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, current.fbo);
+		gl.blitFramebuffer(
+			0,
+			0,
+			this.target.width,
+			this.target.height,
+			0,
+			0,
+			current.width,
+			current.height,
+			gl.COLOR_BUFFER_BIT,
+			gl.NEAREST
+		);
+		gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
+		gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
+		this.restore.push(current);
+
+		const rt = this.redoStack.pop()!;
 		gl.bindFramebuffer(gl.READ_FRAMEBUFFER, rt.fbo);
 		gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, this.target.fbo);
 		gl.blitFramebuffer(
@@ -371,6 +445,8 @@ export class Painter {
 		gl.clearColor(0, 0, 0, 0);
 		gl.clear(gl.COLOR_BUFFER_BIT);
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		this.restore = []; // Clear undo/redo history on clear
+		this.redoStack = [];
 	}
 
 	present(blurPx: number, saturation: number, hueOffsetDeg: number) {
