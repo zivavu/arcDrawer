@@ -81,3 +81,91 @@ body,
 	padding: 6px 10px;
 	border-radius: 8px;
 }
+
+/* Presets panel */
+.panel {
+	position: absolute;
+	bottom: 12px;
+	right: 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 12px 14px;
+	background: var(--panel-bg);
+	border: 1px solid var(--panel-border);
+	border-radius: 10px;
+	backdrop-filter: blur(6px);
+	max-width: min(40vw, 420px);
+}
+
+.presets-header {
+	font-size: 12px;
+	color: var(--muted);
+}
+
+.presets-row {
+	display: flex;
+	gap: 8px;
+}
+
+.preset-name {
+	flex: 1 1 auto;
+	min-width: 0;
+	padding: 8px 10px;
+	font-size: 12px;
+	border-radius: 8px;
+	border: 1px solid var(--panel-border);
+	background: rgba(255, 255, 255, 0.04);
+	color: var(--text);
+}
+
+.preset-save {
+	padding: 8px 12px;
+	font-size: 12px;
+	border-radius: 8px;
+	border: 1px solid var(--panel-border);
+	background: var(--panel-bg);
+	color: var(--text);
+}
+
+.presets-list {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 6px;
+	max-height: 30vh;
+	overflow: auto;
+}
+
+.presets-empty {
+	font-size: 12px;
+	color: var(--muted);
+}
+
+.preset-item {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	gap: 6px;
+}
+
+.preset-item .apply {
+	text-align: left;
+	padding: 8px 10px;
+	font-size: 12px;
+	border-radius: 8px;
+	border: 1px solid var(--panel-border);
+	background: rgba(255, 255, 255, 0.04);
+	color: var(--text);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.preset-item .delete {
+	width: 30px;
+	padding: 8px 0;
+	font-size: 14px;
+	border-radius: 8px;
+	border: 1px solid var(--panel-border);
+	background: rgba(255, 255, 255, 0.04);
+	color: var(--text);
+}

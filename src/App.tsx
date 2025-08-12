@@ -23,14 +23,20 @@ type UiControls = {
 	blurJitter: number;
 };
 
+type BrushPreset = {
+	id: string;
+	name: string;
+	ui: UiControls;
+};
+
 const defaults: UiControls = {
-	blur: 1,
+	blur: 6,
 	saturation: 1,
 	hueOffset: 0,
-	strokesNumber: 5,
+	strokesNumber: 10,
 	lineWidth: 8,
-	lineDecay: 0.2,
-	offsetWeight: 40,
+	lineDecay: 0.5,
+	offsetWeight: 50,
 	previousOffsetMultiplier: 0.8,
 	color: '#d7e7ff',
 	hueRandomize: 40,
@@ -48,7 +54,27 @@ function hexToRgba(hex: string): [number, number, number, number] {
 function App() {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const painterRef = useRef<Painter | null>(null);
-	const [ui, setUi] = useState<UiControls>(defaults);
+	const [ui, setUi] = useState<UiControls>(() => {
+		try {
+			const saved = localStorage.getItem('arcdrawer:lastUi');
+			if (saved) return JSON.parse(saved) as UiControls;
+		} catch {
+			void 0;
+		}
+		return defaults;
+	});
+	const [presets, setPresets] = useState<BrushPreset[]>(() => {
+		try {
+			const raw = localStorage.getItem('arcdrawer:presets');
+			if (!raw) return [];
+			const parsed = JSON.parse(raw) as BrushPreset[];
+			return Array.isArray(parsed) ? parsed : [];
+		} catch {
+			void 0;
+			return [];
+		}
+	});
+	const [presetName, setPresetName] = useState('My Brush');
 	const [mouseHolding, setMouseHolding] = useState(false);
 	const lastPosRef = useRef<{ x: number; y: number } | null>(null);
 	const uiRef = useRef<UiControls>(ui);
@@ -57,6 +83,24 @@ function App() {
 	useEffect(() => {
 		uiRef.current = ui;
 	}, [ui]);
+
+	// persist current UI
+	useEffect(() => {
+		try {
+			localStorage.setItem('arcdrawer:lastUi', JSON.stringify(ui));
+		} catch {
+			void 0;
+		}
+	}, [ui]);
+
+	// persist presets
+	useEffect(() => {
+		try {
+			localStorage.setItem('arcdrawer:presets', JSON.stringify(presets));
+		} catch {
+			void 0;
+		}
+	}, [presets]);
 
 	useEffect(() => {
 		const canvas = canvasRef.current!;
@@ -135,6 +179,22 @@ function App() {
 			) as UiControls[K];
 			setUi((prev) => ({ ...prev, [k]: val }));
 		};
+
+	// presets API
+	const savePreset = () => {
+		const id = `${Date.now().toString(36)}_${Math.random()
+			.toString(36)
+			.slice(2, 7)}`;
+		const name = presetName.trim() || 'Brush';
+		setPresets((prev) => [{ id, name, ui }, ...prev].slice(0, 50));
+	};
+	const applyPreset = (id: string) => {
+		const p = presets.find((p) => p.id === id);
+		if (p) setUi(p.ui);
+	};
+	const deletePreset = (id: string) => {
+		setPresets((prev) => prev.filter((p) => p.id !== id));
+	};
 
 	const undo = useCallback(() => painterRef.current?.undo(), []);
 	const clear = () => painterRef.current?.clear();
@@ -285,6 +345,43 @@ function App() {
 				<button onClick={undo}>Undo</button>
 				<button onClick={clear}>Clear</button>
 				<button onClick={saveImage}>Save PNG</button>
+			</div>
+
+			<div className="presets panel">
+				<div className="presets-header">Brushes</div>
+				<div className="presets-row">
+					<input
+						className="preset-name"
+						value={presetName}
+						onChange={(e) => setPresetName(e.target.value)}
+						placeholder="Preset name"
+					/>
+					<button className="preset-save" onClick={savePreset}>
+						Save
+					</button>
+				</div>
+				<div className="presets-list">
+					{presets.length === 0 && (
+						<div className="presets-empty">No presets yet</div>
+					)}
+					{presets.map((p) => (
+						<div key={p.id} className="preset-item">
+							<button
+								className="apply"
+								title={p.name}
+								onClick={() => applyPreset(p.id)}>
+								{p.name}
+							</button>
+							<button
+								className="delete"
+								aria-label="Delete"
+								title="Delete"
+								onClick={() => deletePreset(p.id)}>
+								×
+							</button>
+						</div>
+					))}
+				</div>
 			</div>
 		</div>
 	);
