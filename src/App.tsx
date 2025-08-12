@@ -5,14 +5,13 @@ import {
 	useState,
 	type ChangeEvent,
 } from 'react';
+import { HexColorPicker } from 'react-colorful';
 import './App.css';
 
 import { Painter, type StrokeSettings } from './gl/painter';
 
 type UiControls = {
 	blur: number;
-	saturation: number;
-	hueOffset: number;
 	strokesNumber: number;
 	lineWidth: number;
 	lineDecay: number;
@@ -31,8 +30,6 @@ type BrushPreset = {
 
 const defaults: UiControls = {
 	blur: 6,
-	saturation: 1,
-	hueOffset: 0,
 	strokesNumber: 10,
 	lineWidth: 8,
 	lineDecay: 0.5,
@@ -76,6 +73,7 @@ function App() {
 	});
 	const [presetName, setPresetName] = useState('My Brush');
 	const [mouseHolding, setMouseHolding] = useState(false);
+	const [showColorPicker, setShowColorPicker] = useState(false);
 	const lastPosRef = useRef<{ x: number; y: number } | null>(null);
 	const uiRef = useRef<UiControls>(ui);
 
@@ -121,9 +119,7 @@ function App() {
 		ro.observe(canvas);
 		resize();
 		const loop = () => {
-			const u = uiRef.current;
-			// Per-line blur is handled in the brush shader; disable global blur here
-			painterRef.current?.present(0.0, u.saturation, u.hueOffset);
+			painterRef.current?.present();
 			requestAnimationFrame(loop);
 		};
 		loop();
@@ -196,6 +192,25 @@ function App() {
 		setPresets((prev) => prev.filter((p) => p.id !== id));
 	};
 
+	// Color presets
+	const colorPresets = [
+		'#FF6B6B',
+		'#4ECDC4',
+		'#45B7D1',
+		'#96CEB4',
+		'#FFEAA7',
+		'#DDA0DD',
+		'#98D8C8',
+		'#F7DC6F',
+		'#BB8FCE',
+		'#85C1E9',
+		'#F8C471',
+		'#82E0AA',
+		'#F1948A',
+		'#85C1E9',
+		'#D2B4DE',
+	];
+
 	const undo = useCallback(() => painterRef.current?.undo(), []);
 	const clear = () => painterRef.current?.clear();
 	const redo = useCallback(() => painterRef.current?.redo(), []);
@@ -225,6 +240,21 @@ function App() {
 		return () => window.removeEventListener('keydown', handleKeyDown);
 	}, [undo, redo]);
 
+	// Close color picker when clicking outside
+	useEffect(() => {
+		const handleClickOutside = (e: MouseEvent) => {
+			const target = e.target as Element;
+			if (!target.closest('.color-picker-container')) {
+				setShowColorPicker(false);
+			}
+		};
+		if (showColorPicker) {
+			document.addEventListener('mousedown', handleClickOutside);
+			return () =>
+				document.removeEventListener('mousedown', handleClickOutside);
+		}
+	}, [showColorPicker]);
+
 	return (
 		<div className="app-root">
 			<canvas
@@ -245,26 +275,6 @@ function App() {
 					step={0.1}
 					value={ui.blur}
 					onChange={change('blur')}
-				/>
-
-				<label>Saturation</label>
-				<input
-					type="range"
-					min={0}
-					max={2}
-					step={0.01}
-					value={ui.saturation}
-					onChange={change('saturation')}
-				/>
-
-				<label>Hue Offset</label>
-				<input
-					type="range"
-					min={-180}
-					max={180}
-					step={1}
-					value={ui.hueOffset}
-					onChange={change('hueOffset')}
 				/>
 
 				<label>Segments</label>
@@ -318,7 +328,37 @@ function App() {
 				/>
 
 				<label>Color</label>
-				<input type="color" value={ui.color} onChange={change('color')} />
+				<div className="color-picker-container">
+					<div
+						className="color-preview"
+						style={{ backgroundColor: ui.color }}
+						onClick={() => setShowColorPicker(!showColorPicker)}
+					/>
+					{showColorPicker && (
+						<div className="color-picker-panel">
+							<div className="color-picker-header">Color Picker</div>
+
+							<HexColorPicker
+								color={ui.color}
+								onChange={(color) => setUi((prev) => ({ ...prev, color }))}
+							/>
+
+							<div className="color-presets">
+								<div className="presets-label">Presets</div>
+								<div className="preset-colors">
+									{colorPresets.map((color, i) => (
+										<div
+											key={i}
+											className="preset-color"
+											style={{ backgroundColor: color }}
+											onClick={() => setUi((prev) => ({ ...prev, color }))}
+										/>
+									))}
+								</div>
+							</div>
+						</div>
+					)}
+				</div>
 
 				<label>Hue Rand</label>
 				<input

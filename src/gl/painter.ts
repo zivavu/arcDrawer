@@ -123,30 +123,13 @@ in vec2 vUv;
 out vec4 outColor;
 uniform sampler2D uTex;
 uniform vec2 uResolution;
-uniform float uBlur;       // disabled (legacy)
-uniform float uSaturation; // 0..2
-uniform float uHue;        // degrees
-
-vec3 hueRotate(vec3 c, float hue){
-  float a = radians(hue);
-  float s = sin(a), co = cos(a);
-  mat3 m = mat3(
-    0.213+0.787*co-0.213*s, 0.715-0.715*co-0.715*s, 0.072-0.072*co+0.928*s,
-    0.213-0.213*co+0.143*s, 0.715+0.285*co+0.140*s, 0.072-0.072*co-0.283*s,
-    0.213-0.213*co-0.787*s, 0.715-0.715*co+0.715*s, 0.072+0.928*co+0.072*s
-  );
-  return c * m;
-}
 
 void main(){
   vec4 c = texture(uTex, vUv);
-  float l = dot(c.rgb, vec3(0.2126,0.7152,0.0722));
-  c.rgb = mix(vec3(l), c.rgb, uSaturation);
-  c.rgb = hueRotate(c.rgb, uHue);
   outColor = c;
 }`;
 
-// Present with optional glow: combine base and blurred glow texture
+// Present with optional glow: combine base and blurred glow texture (no global color tweaks)
 const COMPOSE_FS = `#version 300 es
 precision highp float;
 in vec2 vUv;
@@ -154,27 +137,11 @@ out vec4 outColor;
 uniform sampler2D uBase;
 uniform sampler2D uGlow;
 uniform float uGlowIntensity;
-uniform float uSaturation;
-uniform float uHue;
-
-vec3 hueRotate(vec3 c, float hue){
-  float a = radians(hue);
-  float s = sin(a), co = cos(a);
-  mat3 m = mat3(
-    0.213+0.787*co-0.213*s, 0.715-0.715*co-0.715*s, 0.072-0.072*co+0.928*s,
-    0.213-0.213*co+0.143*s, 0.715+0.285*co+0.140*s, 0.072-0.072*co-0.283*s,
-    0.213-0.213*co-0.787*s, 0.715-0.715*co+0.715*s, 0.072+0.928*co+0.072*s
-  );
-  return c * m;
-}
 
 void main(){
   vec4 base = texture(uBase, vUv);
   vec4 glow = texture(uGlow, vUv);
   vec4 c = base + uGlowIntensity * glow;
-  float l = dot(c.rgb, vec3(0.2126,0.7152,0.0722));
-  c.rgb = mix(vec3(l), c.rgb, uSaturation);
-  c.rgb = hueRotate(c.rgb, uHue);
   outColor = c;
 }`;
 
@@ -224,8 +191,6 @@ export class Painter {
 	private blitProgram: WebGLProgram;
 	private blitLocRes: WebGLUniformLocation;
 	private blitLocBlur: WebGLUniformLocation;
-	private blitLocSat: WebGLUniformLocation;
-	private blitLocHue: WebGLUniformLocation;
 
 	private gaussProgram: WebGLProgram;
 	private gaussLocRes: WebGLUniformLocation;
@@ -233,9 +198,6 @@ export class Painter {
 	private gaussLocSigma: WebGLUniformLocation;
 
 	private composeProgram: WebGLProgram;
-	private composeGlowIntensity: WebGLUniformLocation;
-	private composeSat: WebGLUniformLocation;
-	private composeHue: WebGLUniformLocation;
 
 	private target: RenderTarget;
 	private scratchA: RenderTarget;
@@ -293,8 +255,7 @@ export class Painter {
 		this.blitProgram = createProgram(gl, BLIT_VS, BLIT_FS);
 		this.blitLocRes = gl.getUniformLocation(this.blitProgram, 'uResolution')!;
 		this.blitLocBlur = gl.getUniformLocation(this.blitProgram, 'uBlur')!;
-		this.blitLocSat = gl.getUniformLocation(this.blitProgram, 'uSaturation')!;
-		this.blitLocHue = gl.getUniformLocation(this.blitProgram, 'uHue')!;
+		// removed global saturation & hue uniforms
 
 		// gaussian
 		this.gaussProgram = createProgram(gl, BLIT_VS, GAUSS_FS);
@@ -306,17 +267,7 @@ export class Painter {
 		this.scratchA = createRenderTarget(gl, width, height);
 		this.scratchB = createRenderTarget(gl, width, height);
 
-		// compose (base + glow)
 		this.composeProgram = createProgram(gl, BLIT_VS, COMPOSE_FS);
-		this.composeGlowIntensity = gl.getUniformLocation(
-			this.composeProgram,
-			'uGlowIntensity'
-		)!;
-		this.composeSat = gl.getUniformLocation(
-			this.composeProgram,
-			'uSaturation'
-		)!;
-		this.composeHue = gl.getUniformLocation(this.composeProgram, 'uHue')!;
 		this.clear();
 	}
 
@@ -407,8 +358,6 @@ export class Painter {
 		gl.useProgram(this.blitProgram);
 		gl.uniform2f(this.blitLocRes, dst.width, dst.height);
 		gl.uniform1f(this.blitLocBlur, 0.0);
-		gl.uniform1f(this.blitLocSat, 1.0);
-		gl.uniform1f(this.blitLocHue, 0.0);
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, src.tex);
 		const fs = new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]);
@@ -498,7 +447,7 @@ export class Painter {
 		this.composite(this.scratchA, this.target);
 	}
 
-	captureRestorePoint(limit = 10) {
+	captureRestorePoint(limit = 50) {
 		const gl = this.gl;
 		const copy = createRenderTarget(gl, this.target.width, this.target.height);
 		gl.bindFramebuffer(gl.READ_FRAMEBUFFER, this.target.fbo);
@@ -529,7 +478,6 @@ export class Painter {
 	undo() {
 		const gl = this.gl;
 		if (this.restore.length === 0) return;
-		// Store current state for redo
 		const current = createRenderTarget(
 			gl,
 			this.target.width,
@@ -633,7 +581,7 @@ export class Painter {
 		this.redoStack = [];
 	}
 
-	present(blurPx: number, saturation: number, hueOffsetDeg: number) {
+	present() {
 		const gl = this.gl;
 		gl.useProgram(this.blitProgram);
 		gl.bindVertexArray(this.quadVao);
@@ -641,9 +589,7 @@ export class Painter {
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 		gl.uniform2f(this.blitLocRes, this.target.width, this.target.height);
-		gl.uniform1f(this.blitLocBlur, blurPx);
-		gl.uniform1f(this.blitLocSat, saturation);
-		gl.uniform1f(this.blitLocHue, hueOffsetDeg);
+		gl.uniform1f(this.blitLocBlur, 0.0);
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, this.target.tex);
 
