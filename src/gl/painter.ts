@@ -129,22 +129,6 @@ void main(){
   outColor = c;
 }`;
 
-// Present with optional glow: combine base and blurred glow texture (no global color tweaks)
-const COMPOSE_FS = `#version 300 es
-precision highp float;
-in vec2 vUv;
-out vec4 outColor;
-uniform sampler2D uBase;
-uniform sampler2D uGlow;
-uniform float uGlowIntensity;
-
-void main(){
-  vec4 base = texture(uBase, vUv);
-  vec4 glow = texture(uGlow, vUv);
-  vec4 c = base + uGlowIntensity * glow;
-  outColor = c;
-}`;
-
 // Separable 1D gaussian blur shader (premultiplied alpha safe)
 const GAUSS_FS = `#version 300 es
 precision highp float;
@@ -197,13 +181,11 @@ export class Painter {
 	private gaussLocDir: WebGLUniformLocation;
 	private gaussLocSigma: WebGLUniformLocation;
 
-	private composeProgram: WebGLProgram;
-
 	private target: RenderTarget;
 	private scratchA: RenderTarget;
 	private scratchB: RenderTarget;
 	private restore: RenderTarget[] = [];
-	private redoStack: RenderTarget[] = []; // Add redo stack
+	private redoStack: RenderTarget[] = [];
 
 	constructor(gl: WebGL2RenderingContext, width: number, height: number) {
 		this.gl = gl;
@@ -267,7 +249,6 @@ export class Painter {
 		this.scratchA = createRenderTarget(gl, width, height);
 		this.scratchB = createRenderTarget(gl, width, height);
 
-		this.composeProgram = createProgram(gl, BLIT_VS, COMPOSE_FS);
 		this.clear();
 	}
 
@@ -447,7 +428,7 @@ export class Painter {
 		this.composite(this.scratchA, this.target);
 	}
 
-	captureRestorePoint(limit = 50) {
+	captureRestorePoint(limit = 500) {
 		const gl = this.gl;
 		const copy = createRenderTarget(gl, this.target.width, this.target.height);
 		gl.bindFramebuffer(gl.READ_FRAMEBUFFER, this.target.fbo);
